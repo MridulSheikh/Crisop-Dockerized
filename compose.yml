@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    depends_on: 
+      - api
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    develop:
+      watch:
+       - path: ./frontend/package.json
+         action: rebuild
+       - path: ./frontend/next.config.json
+         action: rebuild
+       - path: ./frontend/package-lock.json
+         action: rebuild
+       - path: .
+         target: /app
+         action: sync
+  api:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+       - 5000:5000 
+    develop:
+      watch:
+        - path: ./api/package.json
+          action: rebuild
+        - path: ./api/package-lock.json
+          action: rebuild
+        - path: ./api
+          target: /src
+          action: sync       
+volumes:
+  anime:

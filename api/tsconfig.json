@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+  "target": "es2016",
+  "module": "commonjs",
+  "rootDir": "./src",
+  "outDir": "./dist",
+  "typeRoots": ["./node_modules/@types", "./src/app/types"],
+  "esModuleInterop": true,
+  "forceConsistentCasingInFileNames": true,
+  "strict": true,
+  "resolveJsonModule": true,
+  "allowSyntheticDefaultImports": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noImplicitReturns": true,
+  "noFallthroughCasesInSwitch": true,
+   "skipLibCheck": true
+},
+  "include": ["src"],
+  "exclude": ["node_modules", "src/app/ui", "vite.config.ts"]
+}

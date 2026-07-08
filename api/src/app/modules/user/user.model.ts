@@ -1,0 +1,85 @@
+import { Schema, model } from 'mongoose';
+import { IUser, UserModel, UserRole } from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
+
+// Mongoose schema
+const userSchema = new Schema<IUser, UserModel>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "facebook"],
+      default: "local",
+    },
+    password: {
+      type: String,
+      // eslint-disable-next-line no-unused-vars
+      required: function (this: IUser) {
+        return this.authProvider === "local"
+      },
+      select: 0,
+    },
+    image: {
+      type: String,
+      default: '',
+    },
+    role: {
+      type: String,
+      enum: Object.values(UserRole),
+      default: UserRole.user,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    needLogin: {
+      type: Boolean,
+      default: false,
+    }
+  },
+  {
+    timestamps: true,
+  },
+);
+
+userSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  if (user.authProvider === "local") {
+    user.password = await bcrypt.hash(user.password, Number(config.BCRYPT_SALT));
+  }
+
+  next();
+});
+
+userSchema.statics.isUserExsitsByUserName = async function (username: string) {
+  const result = await User.findOne({ username }).select('+password');
+  return result;
+};
+
+userSchema.statics.isUserExsitsByUserEmail = async (email: string) => {
+  const result = await User.findOne({ email }).select('+password');
+  return result;
+};
+
+userSchema.statics.isPasswordMatch = async function (
+  plainTextPassword,
+  hashedPassword,
+) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+const User = model<IUser, UserModel>('User', userSchema);
+export default User;

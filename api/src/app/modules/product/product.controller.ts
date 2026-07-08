@@ -1,0 +1,142 @@
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { Request, Response } from 'express';
+import {
+  createProductIntoDBService,
+  getAllProductsFromDBService,
+  getSingleProductFromDBService,
+  updateSingleProductInDBService,
+  removeSingleProductFromDBService,
+  toggleFeaturedStatusService,
+  atlasProductSearchService,
+} from './product.service';
+
+// Create new product
+const createProductController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await createProductIntoDBService(
+      req.body,
+      // eslint-disable-next-line no-undef
+      req.files as Express.Multer.File[],
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Product created successfully',
+      data: result,
+    });
+  },
+);
+
+// Get all products (for all user)
+const getAllProductsController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result= await atlasProductSearchService(
+        req.query.searchTerm as string,
+        req.query,
+      );
+   
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Products retrieved successfully',
+      meta: result.meta,
+      data: result.data,
+    });
+  },
+);
+
+const getAllProductsAdminController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await getAllProductsFromDBService(req.query);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Products retrieved successfully',
+      meta: result.meta,
+      data: result.data,
+    });
+  },
+);
+
+// Get single product
+const getSingleProductController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await getSingleProductFromDBService(req.params.id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Product retrieved successfully',
+      data: result,
+    });
+  },
+);
+
+// Update product
+const updateProductController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await updateSingleProductInDBService(
+      req.params.id,
+      req.body,
+       // eslint-disable-next-line no-undef
+      req.files as Express.Multer.File[],
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Product updated successfully',
+      data: result,
+    });
+  },
+);
+
+// Soft delete product
+const deleteProductController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await removeSingleProductFromDBService(req.params.id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Product deleted successfully',
+      data: {
+        id: result.id,
+        name: result.name,
+      },
+    });
+  },
+);
+
+// Toggle featured status
+const toggleFeaturedController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await toggleFeaturedStatusService(req.params.id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: `Product ${result.isFeatured ? 'marked' : 'unmarked'} as featured`,
+      data: {
+        id: result.id,
+        name: result.name,
+        isFeatured: result.isFeatured,
+      },
+    });
+  },
+);
+
+export {
+  createProductController,
+  getAllProductsController,
+  getSingleProductController,
+  updateProductController,
+  deleteProductController,
+  toggleFeaturedController,
+  getAllProductsAdminController,
+};
