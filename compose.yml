@@ -17,7 +17,7 @@ services:
          action: rebuild
        - path: ./frontend/package-lock.json
          action: rebuild
-       - path: .
+       - path: ./frontend
          target: /app
          action: sync
   api:
@@ -36,4 +36,4 @@ services:
           target: /src
           action: sync       
 volumes:
-  anime:
+  redis:
