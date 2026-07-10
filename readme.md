@@ -134,3 +134,6 @@ Mridul Sheikh
 - LinkedIn: https://www.linkedin.com/in/mridul-sheikh/
 - Email: mridul.sheikh.90@gamil.com
 - WhatsApp: 01883992408
+
+## Overview
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
