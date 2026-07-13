@@ -346,7 +346,7 @@ export default function Chatbot() {
                           </div>
 
                           <Link
-                            href={`/products/${product._id}`}
+                            href={`/shop/${product._id}`}
                             className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-green-500 py-2 text-[11px] font-medium text-white shadow-sm transition hover:bg-green-600 active:scale-[0.98]"
                           >
                             <ShoppingCart size={12} />
