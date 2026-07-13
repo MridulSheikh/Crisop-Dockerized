@@ -22,7 +22,6 @@ const product_service_1 = require("../../product/product.service");
 const groq_1 = require("../../../config/groq");
 const order_model_1 = require("../../order/order.model");
 const order_service_1 = require("../../order/order.service");
-// productDeatils intent service
 // export const productDetailsAssistent = async (prompt: string) => {
 //   if (!prompt) {
 //     throw new AppError(httpStatus.NOT_FOUND, 'prompt not found');
@@ -236,6 +235,13 @@ const productDetailsAssistent = (prompt) => __awaiter(void 0, void 0, void 0, fu
     // Search product
     const products = yield (0, product_service_1.atlasProductSearchService)(searchTerm, queryOptions);
     const queryProducts = products.data.filter((product) => (product === null || product === void 0 ? void 0 : product.isDeleted) !== true && (product === null || product === void 0 ? void 0 : product.isPublished) !== false);
+    if (!queryProducts.length) {
+        return {
+            intentType: 'PRODUCT_DETAILS',
+            data: queryProducts,
+            message: 'Sorry, this product is currently unavailable.',
+        };
+    }
     // Format products for AI
     const productTextData = (0, chat_utils_1.formatProductsForAI)(queryProducts);
     const systemPrompt = `You are a professional e-commerce shopping assistant representing an online store.
@@ -390,10 +396,28 @@ Format:
             }).sort({
                 createdAt: -1,
             });
+            if (!orders.length) {
+                return {
+                    intentType: 'ORDER_DETAILS',
+                    action: 'LIST_ORDER',
+                    message: 'No orders found for this customer.',
+                };
+            }
+            const message = orders
+                .map((order, index) => `
+### Order ${index + 1}
+
+- **Order ID:** ${order.orderId}
+- **Status:** ${order.status}
+- **Total:** ৳${order.total}
+- **Payment:** ${order.isPaymentComplete ? 'Completed' : 'Pending'}
+- **Created:** ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+`)
+                .join('\n');
             return {
                 intentType: 'ORDER_DETAILS',
-                action: data.action,
-                data: orders,
+                action: 'LIST_ORDER',
+                message,
             };
         }
         default:

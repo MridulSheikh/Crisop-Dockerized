@@ -126,11 +126,11 @@ export default function Chatbot() {
       });
 
       setMessages((m) => [...m, ...assistantMessages]);
-    } catch (err) {
+    } catch (err:any) {
       const errorMsg: Message = {
         id: String(Date.now() + 2),
         role: "assistant",
-        content: "Sorry, something went wrong. Please try again later.",
+        content: err.data.errorMessage || "Sorry, something went wrong. Please try again later.",
       };
       setMessages((m) => [...m, errorMsg]);
     }

@@ -20,7 +20,6 @@ type TQueryOptions = {
   maxPrice?: number;
 };
 
-// productDeatils intent service
 // export const productDetailsAssistent = async (prompt: string) => {
 //   if (!prompt) {
 //     throw new AppError(httpStatus.NOT_FOUND, 'prompt not found');
@@ -303,9 +302,16 @@ export const productDetailsAssistent = async (prompt: string) => {
   );
 
   const queryProducts = products.data.filter(
-    (product) =>
-      product?.isDeleted !== true && product?.isPublished !== false,
+    (product) => product?.isDeleted !== true && product?.isPublished !== false,
   );
+
+  if (!queryProducts.length) {
+    return {
+      intentType: 'PRODUCT_DETAILS',
+      data: queryProducts,
+      message: 'Sorry, this product is currently unavailable.',
+    };
+  }
 
   // Format products for AI
   const productTextData = formatProductsForAI(queryProducts);
@@ -478,10 +484,31 @@ Format:
         createdAt: -1,
       });
 
+      if (!orders.length) {
+        return {
+          intentType: 'ORDER_DETAILS',
+          action: 'LIST_ORDER',
+          message: 'No orders found for this customer.',
+        };
+      }
+
+      const message = orders
+        .map(
+          (order, index) => `
+### Order ${index + 1}
+
+- **Order ID:** ${order.orderId}
+- **Status:** ${order.status}
+- **Total:** ৳${order.total}
+- **Payment:** ${order.isPaymentComplete ? 'Completed' : 'Pending'}
+- **Created:** ${new Date(order.createdAt).toLocaleDateString('en-GB')}
+`,
+        )
+        .join('\n');
       return {
         intentType: 'ORDER_DETAILS',
-        action: data.action,
-        data: orders,
+        action: 'LIST_ORDER',
+        message,
       };
     }
 

@@ -24,4 +24,5 @@ export interface IOrder extends Document {
   isCod: boolean;
   isPaymentComplete: boolean;
   total: number;
+  createdAt: Date;
 }
