@@ -232,6 +232,10 @@ export default function LoginPage() {
                       {errors.email.message}
                     </p>
                   )}
+                   <p className="text-sm mt-1">
+                      manager : manager@crisop.com <br/>
+                      admin : admin@crisop.com
+                    </p>
                 </div>
 
                 {/* Password */}
@@ -258,6 +262,10 @@ export default function LoginPage() {
                       {errors.password.message}
                     </p>
                   )}
+                   <p className="text-sm mt-1">
+                      manager : rx9azir12345 <br/>
+                      admin : admin12345
+                    </p>
                 </div>
 
                 {/* Submit */}

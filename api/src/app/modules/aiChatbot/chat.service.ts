@@ -2,8 +2,9 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import User from '../user/user.model';
 import {
+  GenerateContext,
   intentRouter,
-  intentRoutingResponse,
+  
 } from './intentRouter/intentRouter.services';
 import Inbox from './chat.model';
 
@@ -29,9 +30,9 @@ const chatBotService = async (
     
   }
 
-  const intent = await intentRoutingResponse(message);
+  const jobs = await GenerateContext(message);
 
-  const result = await intentRouter(intent as string, message, email);
+  const result = await intentRouter(jobs, message, email);
 
   return result;
 };

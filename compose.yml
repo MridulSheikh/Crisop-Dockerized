@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   web:
     depends_on: 
@@ -11,15 +9,21 @@ services:
       - 3000:3000
     develop:
       watch:
-       - path: ./frontend/package.json
-         action: rebuild
-       - path: ./frontend/next.config.json
-         action: rebuild
-       - path: ./frontend/package-lock.json
-         action: rebuild
-       - path: ./frontend
-         target: /app
-         action: sync
+        - path: ./frontend/package.json
+          action: rebuild
+        - path: ./frontend/next.config.mjs
+          action: rebuild
+        - path: ./frontend/package-lock.json
+          action: rebuild
+        - path: ./frontend
+          target: /app
+          action: sync
+    environment:
+        - WATCHPACK_POLLING=true
+        - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
   api:
     build: 
       context: ./api
@@ -33,7 +37,13 @@ services:
         - path: ./api/package-lock.json
           action: rebuild
         - path: ./api
-          target: /src
-          action: sync       
+          target: /app
+          action: sync
+    environment:
+       - WATCHPACK_POLLING=true
+       - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./api:/app
+      - /app/node_modules
 volumes:
   redis:
