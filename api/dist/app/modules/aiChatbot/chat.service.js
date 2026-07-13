@@ -28,8 +28,8 @@ const chatBotService = (message, email, inboxId) => __awaiter(void 0, void 0, vo
             throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Please provide a valid user email');
         }
     }
-    const intent = yield (0, intentRouter_services_1.intentRoutingResponse)(message);
-    const result = yield (0, intentRouter_services_1.intentRouter)(intent, message, email);
+    const jobs = yield (0, intentRouter_services_1.GenerateContext)(message);
+    const result = yield (0, intentRouter_services_1.intentRouter)(jobs, message, email);
     return result;
 });
 exports.chatService = { chatBotService };

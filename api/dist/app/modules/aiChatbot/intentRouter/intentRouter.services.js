@@ -9,70 +9,143 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.intentRoutingResponse = exports.intentRouter = void 0;
+exports.GenerateContext = exports.intentRouter = void 0;
 const intent_assistent_1 = require("./intent.assistent");
 const groq_1 = require("../../../config/groq");
-const intentRouter = (intent, userPrompt, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
-    switch (intent) {
-        case 'PRODUCT_DETAILS':
-            return (0, intent_assistent_1.productDetailsAssistent)(userPrompt);
-        case 'ORDER_DETAILS':
-            return (0, intent_assistent_1.orderAssistent)(userPrompt, userEmail);
-        case 'GENERAL_QA':
-            return (0, intent_assistent_1.generalQuestion)(userPrompt);
-        default:
-            return {
-                intentResponse: 'Sorry, I could not understand your request.',
-            };
+const intentRouter = (contexts, userPrompt, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = {
+        userPrompt: userPrompt,
+        botResponse: [],
+    };
+    for (const context of contexts) {
+        switch (context.intent) {
+            case 'PRODUCT_DETAILS':
+                result.botResponse.push(yield (0, intent_assistent_1.productDetailsAssistent)(context.userQuery));
+                break;
+            case 'ORDER_DETAILS':
+                result.botResponse.push(yield (0, intent_assistent_1.orderAssistent)(userPrompt, userEmail));
+                break;
+            case 'GENERAL_QA':
+                result.botResponse.push(yield (0, intent_assistent_1.generalQuestion)(userPrompt));
+                break;
+            default:
+                result.botResponse.push({
+                    intentResponse: 'Sorry, I could not understand your request.',
+                });
+                break;
+        }
     }
+    return result;
 });
 exports.intentRouter = intentRouter;
-const intentRoutingResponse = (prompt) => __awaiter(void 0, void 0, void 0, function* () {
+const GenerateContext = (prompt) => __awaiter(void 0, void 0, void 0, function* () {
     const routingResponse = yield groq_1.groq.chat.completions.create({
         model: groq_1.groqAiModel,
         messages: [
             {
                 role: 'system',
-                content: `
-You are an e-commerce intent classifier.
+                content: `You are an e-commerce request planner.
 
-Classify the user message into exactly one:
+Analyze the user's message and produce one or more execution contexts.
 
-PRODUCT_DETAILS:
-User wants to search, browse, view, discover, list, or get information about products.
+Intent must be exactly one of:
 
-Examples:
-"show me some fish"
-"show me all phones"
-"find laptops"
-"give me available products"
-"product price"
+- PRODUCT_DETAILS
+- ORDER_DETAILS
+- GENERAL_QA
 
+Rules:
 
-ORDER_DETAILS:
-User asks about an existing order.
+- First, correct obvious spelling mistakes, typing errors, and common grammatical mistakes.
+- Preserve the user's original intent after correction.
+- Normalize product names, brand names, and common e-commerce terms when possible.
+- Split only if the user has multiple independent requests.
+- Do NOT split simple filters, comparisons, or attributes of the same request.
+- Extract orderId if present; otherwise return null.
+- Never answer the user's question.
+- Never invent products, brands, categories, or order IDs.
+- Return valid JSON only.
+- Do not include markdown, explanations, or extra text.
 
-Examples:
-"where is my order"
-"track my order"
-"cancel my order"
+Examples
 
+Input:
+"show fis and bef"
 
-GENERAL_QA:
-General questions or non-shopping conversations.
+Output:
+{
+  "contexts": [
+    {
+      "intent": "PRODUCT_DETAILS",
+      "userQuery": "show fish",
+      "orderId": null
+    },
+    {
+      "intent": "PRODUCT_DETAILS",
+      "userQuery": "show beef",
+      "orderId": null
+    }
+  ]
+}
 
-Examples:
-"what is fish"
-"how does payment work"
-"hello"
+Input:
+"show pomfrat fish under 1000"
 
+Output:
+{
+  "contexts": [
+    {
+      "intent": "PRODUCT_DETAILS",
+      "userQuery": "show pomfret fish under 1000",
+      "orderId": null
+    }
+  ]
+}
 
-Return only JSON:
+Input:
+"trak ordr #123"
+
+Output:
+{
+  "contexts": [
+    {
+      "intent": "ORDER_DETAILS",
+      "userQuery": "track order #123",
+      "orderId": "123"
+    }
+  ]
+}
+
+Input:
+"show fish and cancle order #123"
+
+Output:
+{
+  "contexts": [
+    {
+      "intent": "PRODUCT_DETAILS",
+      "userQuery": "show fish",
+      "orderId": null
+    },
+    {
+      "intent": "ORDER_DETAILS",
+      "userQuery": "cancel order #123",
+      "orderId": "123"
+    }
+  ]
+}
+
+Return exactly this JSON format:
 
 {
- "intent":"PRODUCT_DETAILS"
-}
-        `,
+  "contexts": [
+    {
+      "intent": "PRODUCT_DETAILS",
+      "userQuery": "string",
+      "orderId": null
+    }
+  ]
+}`,
             },
             {
                 role: 'user',
@@ -82,6 +155,6 @@ Return only JSON:
         temperature: 0,
     });
     const result = JSON.parse(routingResponse.choices[0].message.content);
-    return result.intent;
+    return result.contexts;
 });
-exports.intentRoutingResponse = intentRoutingResponse;
+exports.GenerateContext = GenerateContext;
