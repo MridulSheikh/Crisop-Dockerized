@@ -49,7 +49,7 @@ const suspiciousPatterns: RegExp[] = [
 
 export const aiChatFirewall = () =>
   catchAsync(async (req: Request, _res: Response, next: NextFunction) => {
-    const { message } = req.body;
+    const { prompt: message } = req.body;
 
     if (!message || typeof message !== 'string') {
       throw new AppError(httpStatus.BAD_REQUEST, 'Message is required.');

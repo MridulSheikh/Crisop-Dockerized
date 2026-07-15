@@ -3,7 +3,7 @@ import {
   orderAssistent,
   productDetailsAssistent,
 } from './intent.assistent';
-import { groq, groqAiModel } from '../../../config/groq';
+import { groq, groqAiModel } from '../../../../config/groq';
 
 type TContext = {
   intent: string;
