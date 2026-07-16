@@ -19,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@google/genai": "^2.8.0",
+    "@huggingface/inference": "^4.13.23",
     "@qdrant/js-client-rest": "^1.18.0",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",

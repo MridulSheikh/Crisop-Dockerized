@@ -70,3 +70,48 @@ Tags: ${product.tags?.join(", ") || ""}
     })
     .join("\n-------------------\n");
 };
+
+
+// Data normization
+export const normalizeOrder = (order: any) => ({
+  orderId: order.orderId,
+  status: order.status,
+  total: order.total,
+  paymentStatus: order.isPaymentComplete ? "Paid" : "Pending",
+  paymentMethod: order.isCod ? "Cash on Delivery" : "Online",
+  isCancelled: order.isCancel,
+  createdAt: order.createdAt,
+
+  shipping: {
+    address: order.shippingInfo.addressOneLine,
+    division: order.shippingInfo.division,
+    contact: order.shippingInfo.contact,
+  },
+
+  items: order.items.map((item: any) => ({
+    name: item.product.name,
+    price: item.price,
+    quantity: item.quantity,
+    image: item.product.images?.[0]?.url,
+  })),
+});
+
+export const normalizeProduct = (product: any | any[]) => {
+  if (Array.isArray(product)) {
+    return product.map(normalizeSingleProduct);
+  }
+
+  return normalizeSingleProduct(product);
+};
+
+const normalizeSingleProduct = (product: any) => ({
+  id: product._id,
+  name: product.name,
+  price: product.discountPrice ?? product.price,
+  regularPrice: product.price,
+  category: product?.category?.name ?? null,
+  brand: product?.brand?.name ?? null,
+  image: product.images?.[0]?.url ?? null,
+  inStock: product.isPublished && !product.isDeleted,
+  tags: product.tags,
+});

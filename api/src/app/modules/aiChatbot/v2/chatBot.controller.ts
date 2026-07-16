@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import catchAsync from '../../../utils/catchAsync';
-import { ChatbotBuilder } from '../../../builder/ChatBotBuilder';
+import { ChatbotBuilder, INTENTS } from '../../../builder/ChatBotBuilder';
 import sendResponse from '../../../utils/sendResponse';
 import httpStatus from 'http-status';
 import z from 'zod';
-import { orderAssistent, productDetailsAssistent } from '../v1/intentRouter/intent.assistent';
+import { productDetailsHandler, getOrderHandler, cancelOrderHandler, generalQuestionHandler } from './actionHandler';
 
 const chatBotController = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -16,62 +16,137 @@ const chatBotController = catchAsync(async (req: Request, res: Response) => {
     email: user.email,
   });
 
+  // add actions
   chatBotTools.addAction(
-    'PRODUCT_DETAILS',
+    INTENTS.PRODUCT_DETAILS,
     {
       title: 'Product details',
       description: '...',
 
       inputSchema: z.object({
         prompt: z.string(),
+        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
       }),
 
       outputSchema: z.object({
         intentType: z.string(),
-        data: z.array(z.any()),
-        message: z.string().nullable(),
+        data: z.any().optional(),
+        error: z
+          .object({
+            code: z.string(),
+            message: z.string(),
+          })
+          .optional(),
       }),
     },
 
-    async ({ prompt }) => {
-      return productDetailsAssistent(prompt);
+    async ({ prompt, intent }) => {
+      const result = await productDetailsHandler(prompt, intent as keyof typeof INTENTS);
+      return result;
     },
   );
 
   chatBotTools.addAction(
-    'ORDER_DETAILS',
+    INTENTS.GET_ORDER,
     {
-      title: 'order details',
+      title: 'Get order data from db',
       description: '...',
 
       inputSchema: z.object({
-        prompt: z.string(),
-        email: z.string()
+        email: z.string(),
+        orderId: z.string().nullable().optional(),
+        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
       }),
 
       outputSchema: z.object({
         intentType: z.string(),
-        message: z.string().nullable(),
-        data: z.any().optional()
+        data: z.any().optional(),
+        error: z
+          .object({
+            code: z.string(),
+            message: z.string(),
+          })
+          .optional(),
       }),
     },
-
-    async ({ prompt, email }) => {
-      const result = await orderAssistent(prompt, email);
-      return {
-        intentType: result.intentType,
-        message: result.message || null,
-        data: result.data,
-      };
+    async ({ orderId, email, intent }) => {
+      const result = await getOrderHandler(
+        email,
+        intent as keyof typeof INTENTS,
+        orderId as string,
+      );
+      return result;
     },
   );
 
+   chatBotTools.addAction(
+    INTENTS.CANCEL_ORDER,
+    {
+      title: 'Perform order canceling',
+      description: '...',
+
+      inputSchema: z.object({
+        email: z.string(),
+        orderId: z.string().nullable().optional(),
+        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
+      }),
+
+      outputSchema: z.object({
+        intentType: z.string(),
+        data: z.any().optional(),
+        error: z
+          .object({
+            code: z.string(),
+            message: z.string(),
+          })
+          .optional(),
+      }),
+    },
+    async ({ orderId, email, intent }) => {
+      const result = await cancelOrderHandler({
+        email : email,
+        intent: intent as keyof typeof INTENTS,
+        orderId: orderId as string}
+      );
+      return result;
+    },
+  );
+
+  chatBotTools.addAction(
+    INTENTS.GENERAL_QA,
+    {
+      title: 'general QA',
+      description: '...',
+
+      inputSchema: z.object({
+        prompt: z.string(),
+        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
+      }),
+
+      outputSchema: z.object({
+        intentType: z.string(),
+          data: z.any().optional(),
+        error: z
+          .object({
+            code: z.string(),
+            message: z.string(),
+          })
+          .optional()
+      }),
+    },
+
+    async ({ prompt, intent }) => {
+      const result = await generalQuestionHandler({prompt, intent: intent as keyof typeof INTENTS});
+      return result;
+    },
+  );
+
+  // get tool Response
   const botResponse = await chatBotTools.run();
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Successfully generate Intent',
     data: botResponse,
   });
 });

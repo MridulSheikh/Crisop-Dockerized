@@ -344,9 +344,9 @@ Example:
 
 Here are the best matches for your request:
 
-- **Pomfret Fish (Rupchanda)** — ৳1750
-- **Aar Fish** — ৳650
-- **Bata Fish** — ৳375
+- **Pomfret Fish (Rupchanda)** — $1750
+- **Aar Fish** — $650
+- **Bata Fish** — $375
 
 Products:
 ${productTextData}`;

@@ -6,6 +6,15 @@ type TUser = {
   email: string;
 };
 
+export const INTENTS = {
+  PRODUCT_DETAILS: 'PRODUCT_DETAILS',
+  GET_ORDER: 'GET_ORDER',
+  CANCEL_ORDER: 'CANCEL_ORDER',
+  GENERAL_QA: 'GENERAL_QA',
+} as const;
+
+export type TIntent = keyof typeof INTENTS;
+
 type TAction<
   TInput extends ZodTypeAny = ZodTypeAny,
   TOutput extends ZodTypeAny = ZodTypeAny,
@@ -23,7 +32,7 @@ type TAction<
 };
 
 type TIntentContext = {
-  intent: string;
+  intent: TIntent;
   userQuery: string;
   orderId: string | null;
 };
@@ -55,7 +64,9 @@ export class ChatbotBuilder {
     Intent must be exactly one of:
     
     - PRODUCT_DETAILS
-    - ORDER_DETAILS
+    - GET_ORDER
+    - CANCEL_ORDER
+    - LIST_ORDER
     - GENERAL_QA
     
     Rules:
@@ -203,7 +214,13 @@ export class ChatbotBuilder {
     const action = this.actions.get(intent);
 
     if (!action) {
-      throw new Error(`Action "${intent}" not found.`);
+      return {
+        intentType: intent,
+        error: {
+          code: 'ACTION_NOT_FOUND',
+          message: 'Action not found please try again',
+        },
+      };
     }
 
     // Validate input
@@ -226,7 +243,9 @@ export class ChatbotBuilder {
         intent: context.intent,
         result: await this.runAction(context.intent, {
           prompt: context.userQuery,
-          email: this.user.email
+          email: this.user.email,
+          orderId: context.orderId,
+          intent: context.intent,
         }),
       })),
     );
