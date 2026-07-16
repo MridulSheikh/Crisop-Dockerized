@@ -66,7 +66,6 @@ export class ChatbotBuilder {
     - PRODUCT_DETAILS
     - GET_ORDER
     - CANCEL_ORDER
-    - LIST_ORDER
     - GENERAL_QA
     
     Rules:

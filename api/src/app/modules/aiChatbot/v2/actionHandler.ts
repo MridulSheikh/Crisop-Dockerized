@@ -1,4 +1,3 @@
-import { TIntent } from './../../../builder/ChatBotBuilder';
 import httpStatus from 'http-status';
 import AppError from '../../../errors/AppError';
 import { TSearchOptions } from '../../product/product.interface';
@@ -24,7 +23,6 @@ type TQueryOptions = {
 
 export const productDetailsHandler = async (
   prompt: string,
-  intent: TIntent,
 ) => {
   if (!prompt?.trim()) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Prompt is required');
@@ -112,7 +110,6 @@ export const productDetailsHandler = async (
 
   if (!queryProducts.length) {
     return {
-      intentType: intent,
       error: {
         code: 'PRODUCT_NOT_FOUND',
         message: 'Product not found',
@@ -120,15 +117,11 @@ export const productDetailsHandler = async (
     };
   }
 
-  return {
-    intentType: intent,
-    data: normalizeProduct(queryProducts),
-  };
+  return  normalizeProduct(queryProducts);
 };
 
 export const getOrderHandler = async (
   email: string,
-  intent: TIntent,
   orderId?: string,
 ) => {
   let order;
@@ -148,36 +141,29 @@ export const getOrderHandler = async (
 
   if (!order || (Array.isArray(order) && order.length === 0)) {
     return {
-      intentType: intent,
-      data: null,
       error: {
         code: 'ORDER_NOT_FOUND',
         message: 'Order not found.',
       },
     };
   }
-
-  return {
-    intentType: intent,
-    data: Array.isArray(order)
+   
+  const result = Array.isArray(order)
       ? order.map(normalizeOrder)
-      : normalizeOrder(order),
-  };
+      : normalizeOrder(order);
+
+  return result;
 };
 
 export const cancelOrderHandler = async ({
   email,
-  intent,
   orderId,
 }: {
   email: string;
-  intent: TIntent;
   orderId?: string;
 }) => {
   if (!orderId) {
     return {
-      intentType: intent,
-      data: null,
       error: {
         code: 'ORDER_ID_REQUIRED',
         message: 'Please provide your order ID.',
@@ -192,8 +178,6 @@ export const cancelOrderHandler = async ({
 
   if (!order) {
     return {
-      intentType: intent,
-      data: null,
       error: {
         code: 'ORDER_NOT_FOUND',
         message: 'Order not found.',
@@ -203,8 +187,6 @@ export const cancelOrderHandler = async ({
 
   if (order.isCancel) {
     return {
-      intentType: intent,
-      data: normalizeOrder(order),
       error: {
         code: 'ORDER_ALREADY_CANCELLED',
         message: 'This order has already been cancelled.',
@@ -215,11 +197,10 @@ export const cancelOrderHandler = async ({
   // prevent cancel after shipping
   if (['shipped', 'delivered'].includes(order.status)) {
     return {
-      intentType: intent,
-      data: normalizeOrder(order),
       error: {
         code: 'CANNOT_CANCEL_ORDER',
         message: 'Cannot cancel after order is shipped or delivered',
+        errorData: normalizeOrder(order),
       },
     };
   }
@@ -231,24 +212,18 @@ export const cancelOrderHandler = async ({
   );
 
   return {
-    intentType: intent,
-    canceled: true,
+    message: 'Order canceled.',
     data: normalizeOrder(result),
   };
 };
 
 export const generalQuestionHandler = async ({
   prompt,
-  intent,
 }: {
   prompt: string;
-  intent: TIntent;
 }) => {
   if (!prompt) {
     throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Prompt not found!');
-  }
-  if (!intent) {
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Intent not found!');
   }
 
   // prompt embedding
@@ -268,7 +243,6 @@ export const generalQuestionHandler = async ({
 
   if(result.points.length === 0){
     return {
-      intentType: intent,
       error: {
         code: 'CONTENT_NOT_FOUND!',
         message: 'Please provide a valid context.',
@@ -286,8 +260,5 @@ export const generalQuestionHandler = async ({
   });
   
   // Print result
-  return {
-    intentType: intent,
-    data: normalizedResult,
-  }
+  return normalizedResult;
 };

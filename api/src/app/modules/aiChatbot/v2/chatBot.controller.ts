@@ -4,7 +4,12 @@ import { ChatbotBuilder, INTENTS } from '../../../builder/ChatBotBuilder';
 import sendResponse from '../../../utils/sendResponse';
 import httpStatus from 'http-status';
 import z from 'zod';
-import { productDetailsHandler, getOrderHandler, cancelOrderHandler, generalQuestionHandler } from './actionHandler';
+import {
+  productDetailsHandler,
+  getOrderHandler,
+  cancelOrderHandler,
+  generalQuestionHandler,
+} from './actionHandler';
 
 const chatBotController = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -25,23 +30,13 @@ const chatBotController = catchAsync(async (req: Request, res: Response) => {
 
       inputSchema: z.object({
         prompt: z.string(),
-        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
       }),
 
-      outputSchema: z.object({
-        intentType: z.string(),
-        data: z.any().optional(),
-        error: z
-          .object({
-            code: z.string(),
-            message: z.string(),
-          })
-          .optional(),
-      }),
+      outputSchema: z.any(),
     },
 
-    async ({ prompt, intent }) => {
-      const result = await productDetailsHandler(prompt, intent as keyof typeof INTENTS);
+    async ({ prompt }) => {
+      const result = await productDetailsHandler(prompt);
       return result;
     },
   );
@@ -55,31 +50,17 @@ const chatBotController = catchAsync(async (req: Request, res: Response) => {
       inputSchema: z.object({
         email: z.string(),
         orderId: z.string().nullable().optional(),
-        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
       }),
 
-      outputSchema: z.object({
-        intentType: z.string(),
-        data: z.any().optional(),
-        error: z
-          .object({
-            code: z.string(),
-            message: z.string(),
-          })
-          .optional(),
-      }),
+      outputSchema: z.any(),
     },
-    async ({ orderId, email, intent }) => {
-      const result = await getOrderHandler(
-        email,
-        intent as keyof typeof INTENTS,
-        orderId as string,
-      );
+    async ({ orderId, email }) => {
+      const result = await getOrderHandler(email, orderId as string);
       return result;
     },
   );
 
-   chatBotTools.addAction(
+  chatBotTools.addAction(
     INTENTS.CANCEL_ORDER,
     {
       title: 'Perform order canceling',
@@ -88,26 +69,15 @@ const chatBotController = catchAsync(async (req: Request, res: Response) => {
       inputSchema: z.object({
         email: z.string(),
         orderId: z.string().nullable().optional(),
-        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
       }),
 
-      outputSchema: z.object({
-        intentType: z.string(),
-        data: z.any().optional(),
-        error: z
-          .object({
-            code: z.string(),
-            message: z.string(),
-          })
-          .optional(),
-      }),
+      outputSchema: z.any(),
     },
-    async ({ orderId, email, intent }) => {
+    async ({ orderId, email }) => {
       const result = await cancelOrderHandler({
-        email : email,
-        intent: intent as keyof typeof INTENTS,
-        orderId: orderId as string}
-      );
+        email: email,
+        orderId: orderId as string,
+      });
       return result;
     },
   );
@@ -120,23 +90,13 @@ const chatBotController = catchAsync(async (req: Request, res: Response) => {
 
       inputSchema: z.object({
         prompt: z.string(),
-        intent: z.enum(Object.values(INTENTS) as [string, ...string[]]),
       }),
 
-      outputSchema: z.object({
-        intentType: z.string(),
-          data: z.any().optional(),
-        error: z
-          .object({
-            code: z.string(),
-            message: z.string(),
-          })
-          .optional()
-      }),
+      outputSchema: z.any(),
     },
 
-    async ({ prompt, intent }) => {
-      const result = await generalQuestionHandler({prompt, intent: intent as keyof typeof INTENTS});
+    async ({ prompt }) => {
+      const result = await generalQuestionHandler({ prompt });
       return result;
     },
   );
