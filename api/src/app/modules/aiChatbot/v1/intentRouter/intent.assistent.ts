@@ -1,17 +1,17 @@
 import httpStatus from 'http-status';
-import AppError from '../../../errors/AppError';
-import { getAllBrandFromDBService } from '../../brand/brand.service';
-import { getAllCategoryFromDBService } from '../../category/category.service';
+import AppError from '../../../../errors/AppError';
+import { getAllBrandFromDBService } from '../../../brand/brand.service';
+import { getAllCategoryFromDBService } from '../../../category/category.service';
 import {
   extractIds,
   extractSearchTerm,
   formatProductsForAI,
-} from '../chat.utils';
-import { atlasProductSearchService } from '../../product/product.service';
-import { TSearchOptions } from '../../product/product.interface';
-import { groq, groqAiModel } from '../../../config/groq';
-import { Order } from '../../order/order.model';
-import { canceledOrderServices } from '../../order/order.service';
+} from '../../chat.utils';
+import { atlasProductSearchService } from '../../../product/product.service';
+import { TSearchOptions } from '../../../product/product.interface';
+import { groq, groqAiModel } from '../../../../config/groq';
+import { Order } from '../../../order/order.model';
+import { canceledOrderServices } from '../../../order/order.service';
 
 type TQueryOptions = {
   category?: string;
@@ -344,9 +344,9 @@ Example:
 
 Here are the best matches for your request:
 
-- **Pomfret Fish (Rupchanda)** — ৳1750
-- **Aar Fish** — ৳650
-- **Bata Fish** — ৳375
+- **Pomfret Fish (Rupchanda)** — $1750
+- **Aar Fish** — $650
+- **Bata Fish** — $375
 
 Products:
 ${productTextData}`;
@@ -435,7 +435,7 @@ Format:
   if (!order) {
     return {
       intentType: 'ORDER_DETAILS',
-      messsge: "I couldn't find your order. Please try again with Order ID",
+      message: "I couldn't find your order. Please try again with Order ID",
     };
   }
 

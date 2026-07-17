@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
-import AppError from '../../errors/AppError';
-import User from '../user/user.model';
+import AppError from '../../../errors/AppError';
+import User from '../../user/user.model';
 import {
   GenerateContext,
   intentRouter,
@@ -10,7 +10,10 @@ import Inbox from './chat.model';
 
 const chatBotService = async (
   message: string,
-  email: string,
+  user: {
+    email: string;
+    name: string;
+  },
   inboxId?: string,
 ) => {
   // chek inbox id
@@ -18,7 +21,7 @@ const chatBotService = async (
 
   if (!inbox) {
     // check if user exist or not
-    const isUserExists = await User.isUserExsitsByUserEmail(email);
+    const isUserExists = await User.isUserExsitsByUserEmail(user.email);
 
     if (!isUserExists) {
       throw new AppError(
@@ -32,7 +35,7 @@ const chatBotService = async (
 
   const jobs = await GenerateContext(message);
 
-  const result = await intentRouter(jobs, message, email);
+  const result = await intentRouter(jobs, message, user.email);
 
   return result;
 };

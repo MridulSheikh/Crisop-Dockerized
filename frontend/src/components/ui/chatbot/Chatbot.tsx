@@ -3,30 +3,21 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Leaf, Send, X, ShoppingCart } from "lucide-react";
+import { Leaf, Send, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { closeChatbot } from "@/redux/features/bot/chatbotSlice";
 import { useCurrentUser } from "@/redux/features/auth/authSlice";
-import { useSendMessageMutation } from "@/redux/features/bot/chatbot.api";
+import {
+  useGetAllMessageQuery,
+  useSendMessageMutation,
+} from "@/redux/features/bot/chatbot.api";
 import Markdown from "react-markdown";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-type ProductItem = {
-  _id: string;
-  name: string;
-  price: number;
-  discountPrice: number;
-  imageUrl: string;
-};
-
 type Message = {
-  intent?: string;
-  id: string;
   role: "user" | "assistant";
-  content?: string;
-  products?: ProductItem[];
+  content: string;
 };
 
 export default function Chatbot() {
@@ -42,6 +33,20 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
 
   const [sendMessage, { isLoading: sending }] = useSendMessageMutation();
+  const {
+    data: fetchAllmessage,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetAllMessageQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  useEffect(() => {
+    if (fetchAllmessage?.data) {
+      setMessages(fetchAllmessage.data);
+    }
+  }, [fetchAllmessage]);
 
   // Scroll to bottom when messages change or when the bot is typing
   useEffect(() => {
@@ -52,7 +57,6 @@ export default function Chatbot() {
     if (!text.trim()) return;
 
     const userMsg: Message = {
-      id: String(Date.now()),
       role: "user",
       content: text,
     };
@@ -60,77 +64,20 @@ export default function Chatbot() {
     setInputValue("");
 
     try {
-      const res: any = await sendMessage({ message: text }).unwrap();
-      const payload = res?.data ?? res;
+      const res: any = await sendMessage({ prompt: text }).unwrap();
+      const botResponses = res?.data;
 
-      const botResponses =
-        payload?.botResponse ??
-        payload?.bot_response ??
-        payload?.responses ??
-        [];
-
-      if (!Array.isArray(botResponses)) {
-        const fallback: Message = {
-          intent: payload.intentType,
-          id: String(Date.now() + 1),
-          role: "assistant",
-          content: String(
-            payload?.message ?? payload?.botMessage ?? JSON.stringify(payload),
-          ),
-        };
-        setMessages((m) => [...m, fallback]);
-        return;
-      }
-
-      const assistantMessages: Message[] = [];
-      botResponses.forEach((item: any) => {
-        const intent = item.intentType;
-        if (intent === "PRODUCT_DETAILS") {
-          const products = (item.data ?? []).map((p: any) => ({
-            _id: p._id,
-            name: p.name,
-            price: p.price,
-            discountPrice: p.discountPrice ?? p.price,
-            imageUrl: p.images && p.images[0]?.url,
-          }));
-
-          assistantMessages.push({
-            intent: item.intentType,
-            id: String(Date.now() + Math.random()),
-            role: "assistant",
-            content: item.message ?? item.msg ?? "Here are some products:",
-            products,
-          });
-        } else if (intent === "ORDER_DETAILS") {
-          const textMsg =
-            item.message ??
-            item.messsge ??
-            item.msg ??
-            "I couldn't find your order. Please try again with Order ID";
-          assistantMessages.push({
-            intent: item.intentType,
-            id: String(Date.now() + Math.random()),
-            role: "assistant",
-            content: textMsg,
-          });
-        } else {
-          const textMsg =
-            item.message ?? item.msg ?? item.text ?? JSON.stringify(item);
-          assistantMessages.push({
-            intent: item.intentType,
-            id: String(Date.now() + Math.random()),
-            role: "assistant",
-            content: textMsg,
-          });
-        }
-      });
-
-      setMessages((m) => [...m, ...assistantMessages]);
-    } catch (err:any) {
-      const errorMsg: Message = {
-        id: String(Date.now() + 2),
+      const botMsg: Message = {
         role: "assistant",
-        content: err.data.errorMessage || "Sorry, something went wrong. Please try again later.",
+        content: botResponses,
+      };
+      setMessages((m) => [...m, botMsg]);
+    } catch (err: any) {
+      const errorMsg: Message = {
+        role: "assistant",
+        content:
+          err.data.errorMessage ||
+          "Sorry, something went wrong. Please try again later.",
       };
       setMessages((m) => [...m, errorMsg]);
     }
@@ -174,7 +121,6 @@ export default function Chatbot() {
 
           {/* Chat Timeline Body */}
           <div className="flex-1 overflow-y-auto bg-gradient-to-b from-green-50/30 to-white p-4 space-y-4 scrollbar-thin scrollbar-thumb-green-100">
-
             {/* greeting ui */}
             {messages.length <= 1 && (
               <div className="flex flex-col items-center justify-center py-6 text-center animate-fade-in">
@@ -225,138 +171,172 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
-            {messages.map((message) => (
+            {messages.map((message, index) => (
               <div
-                key={message.id}
+                key={index}
                 className={cn(
-                  "flex flex-col max-w-[85%]",
-                  message.role === "user"
-                    ? "ml-auto items-end"
-                    : "mr-auto items-start",
+                  "flex w-full animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
+                  message.role === "user" ? "justify-end" : "justify-start",
                 )}
               >
-                {/* Text Bubble */}
-                {message.content && (
-                  <div
-                    className={cn(
-                      "rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm transition-all",
-                      message.role === "user"
-                        ? "rounded-tr-none bg-green-600 text-white shadow-green-100"
-                        : "rounded-tl-none bg-gray-100 text-gray-800 border border-gray-200/50",
-                    )}
-                  >
-                    <Markdown
-                      components={{
-                        h1: ({ children }) => (
-                          <h1 className="text-lg font-bold mb-1.5">
-                            {children}
-                          </h1>
-                        ),
-                        h2: ({ children }) => (
-                          <h2 className="text-base font-semibold mb-1">
-                            {children}
-                          </h2>
-                        ),
-                        h3: ({ children }) => (
-                          <h3 className="text-sm font-semibold mb-1">
-                            {children}
-                          </h3>
-                        ),
-                        p: ({ children }) => (
-                          <p
-                            className={cn(
-                              "text-xs sm:text-sm whitespace-pre-line break-words",
-                              message.role === "user"
-                                ? "text-white"
-                                : "text-gray-700",
-                            )}
-                          >
-                            {children}
-                          </p>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className="list-disc pl-4 space-y-0.5 my-1 text-xs sm:text-sm">
-                            {children}
-                          </ul>
-                        ),
-                        ol: ({ children }) => (
-                          <ol className="list-decimal pl-4 space-y-0.5 my-1 text-xs sm:text-sm">
-                            {children}
-                          </ol>
-                        ),
-                        li: ({ children }) => (
-                          <li
-                            className={cn(
-                              message.role === "user"
-                                ? "text-white"
-                                : "text-gray-700",
-                            )}
-                          >
-                            {children}
-                          </li>
-                        ),
-                        strong: ({ children }) => (
-                          <strong className="font-semibold">{children}</strong>
-                        ),
-                      }}
+                <div className="max-w-[90%] sm:max-w-[82%] lg:max-w-[90%]">
+                  {message.content && (
+                    <div
+                      className={cn(
+                        "rounded-2xl px-4 py-2.5 shadow-sm transition-all",
+                        message.role === "user"
+                          ? "rounded-br-md bg-green-600 text-white"
+                          : "rounded-bl-md border border-gray-200 bg-white text-gray-800",
+                      )}
                     >
-                      {message.content}
-                    </Markdown>
-                  </div>
-                )}
+                      <Markdown
+                        components={{
+                          h1: ({ children }) => (
+                            <h1 className="mb-2 text-base font-bold">
+                              {children}
+                            </h1>
+                          ),
 
-                {/* Horizontal Product Grid Slider */}
-                {message.products && message.products.length > 0 && (
-                  <div className="flex w-[90vw] sm:w-[380px] gap-3 overflow-x-auto pb-2 pt-2 scrollbar-none snap-x -ml-2">
-                    {message.products.map((product) => (
-                      <div
-                        key={product._id}
-                        className="w-[160px] flex-shrink-0 snap-start rounded-2xl border border-gray-100 bg-white p-2.5 shadow-sm transition hover:shadow-md hover:border-green-100"
+                          h2: ({ children }) => (
+                            <h2 className="mb-2 mt-3 text-[15px] font-semibold">
+                              {children}
+                            </h2>
+                          ),
+
+                          h3: ({ children }) => (
+                            <h3 className="mb-1 mt-2 text-sm font-semibold">
+                              {children}
+                            </h3>
+                          ),
+
+                          p: ({ children }) => (
+                            <p
+                              className={cn(
+                                "text-sm leading-6 break-words [&:not(:last-child)]:mb-2",
+                                message.role === "user"
+                                  ? "text-white"
+                                  : "text-gray-700",
+                              )}
+                            >
+                              {children}
+                            </p>
+                          ),
+
+                          ul: ({ children }) => (
+                            <ul className="my-2 list-disc space-y-1 pl-5 text-sm">
+                              {children}
+                            </ul>
+                          ),
+
+                          ol: ({ children }) => (
+                            <ol className="my-2 list-decimal space-y-1 pl-5 text-sm">
+                              {children}
+                            </ol>
+                          ),
+
+                          li: ({ children }) => (
+                            <li
+                              className={cn(
+                                "leading-6",
+                                message.role === "user"
+                                  ? "text-white"
+                                  : "text-gray-700",
+                              )}
+                            >
+                              {children}
+                            </li>
+                          ),
+
+                          strong: ({ children }) => (
+                            <strong className="font-semibold">
+                              {children}
+                            </strong>
+                          ),
+
+                          em: ({ children }) => (
+                            <em className="italic">{children}</em>
+                          ),
+
+                          blockquote: ({ children }) => (
+                            <blockquote
+                              className={cn(
+                                "my-2 border-l-4 pl-3 italic text-sm",
+                                message.role === "user"
+                                  ? "border-green-300 text-green-100"
+                                  : "border-green-500 text-gray-600",
+                              )}
+                            >
+                              {children}
+                            </blockquote>
+                          ),
+
+                          code: ({ children }) => (
+                            <code
+                              className={cn(
+                                "rounded px-1.5 py-0.5 font-mono text-[13px]",
+                                message.role === "user"
+                                  ? "bg-green-700 text-white"
+                                  : "bg-gray-100 text-red-600",
+                              )}
+                            >
+                              {children}
+                            </code>
+                          ),
+
+                          pre: ({ children }) => (
+                            <pre className="my-3 overflow-x-auto rounded-xl bg-gray-900 p-3 text-[13px] text-gray-100">
+                              {children}
+                            </pre>
+                          ),
+
+                          a: ({ href, children }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                "underline underline-offset-2",
+                                message.role === "user"
+                                  ? "text-green-100"
+                                  : "text-green-600 hover:text-green-700",
+                              )}
+                            >
+                              {children}
+                            </a>
+                          ),
+
+                          hr: () => <hr className="my-3 border-gray-300" />,
+
+                          table: ({ children }) => (
+                            <div className="my-3 overflow-x-auto">
+                              <table className="min-w-full border-collapse text-sm">
+                                {children}
+                              </table>
+                            </div>
+                          ),
+
+                          thead: ({ children }) => (
+                            <thead className="bg-gray-100">{children}</thead>
+                          ),
+
+                          th: ({ children }) => (
+                            <th className="border border-gray-300 px-3 py-2 text-left font-medium">
+                              {children}
+                            </th>
+                          ),
+
+                          td: ({ children }) => (
+                            <td className="border border-gray-300 px-3 py-2">
+                              {children}
+                            </td>
+                          ),
+                        }}
                       >
-                        {/* Product Image */}
-                        <div className="relative h-24 w-full overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center">
-                          {product.imageUrl ? (
-                            <Image
-                              src={product.imageUrl}
-                              alt={product.name}
-                              fill
-                              sizes="160px"
-                              className="object-cover object-center"
-                            />
-                          ) : (
-                            <Bot className="text-gray-300" size={24} />
-                          )}
-                        </div>
-
-                        {/* Product Info */}
-                        <div className="mt-2 flex flex-col justify-between">
-                          <h4 className="truncate text-xs font-semibold text-gray-800">
-                            {product.name}
-                          </h4>
-
-                          <div className="mt-1 flex items-baseline justify-between">
-                            <span className="text-xs font-bold text-green-600">
-                              ৳{product.discountPrice}
-                            </span>
-                            {product.price > product.discountPrice && (
-                              <span className="text-[10px] text-gray-400 line-through">
-                                ৳{product.price}
-                              </span>
-                            )}
-                          </div>
-
-                          <Link
-                            href={`/shop/${product._id}`}
-                            className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-green-500 py-2 text-[11px] font-medium text-white shadow-sm transition hover:bg-green-600 active:scale-[0.98]"
-                          >
-                            <ShoppingCart size={12} />
-                            View Details
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        {message.content}
+                      </Markdown>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
 
@@ -429,15 +409,15 @@ export default function Chatbot() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={
-                      sending ? "Crisop AI is typing..." : "Ask Crisop AI..."
+                     isLoading? "Chat loading..." :  sending ? "Crisop AI is typing..." : "Ask Crisop AI..."
                     }
                     className="w-full bg-transparent text-sm text-gray-700 outline-none pr-10 py-1.5 disabled:opacity-50"
-                    disabled={sending}
+                    disabled={sending ||  isLoading}
                   />
 
                   <button
                     type="submit"
-                    disabled={!inputValue.trim() || sending}
+                    disabled={!inputValue.trim() || sending || isLoading}
                     className="absolute right-2 flex h-8 w-8 items-center justify-center rounded-xl bg-green-500 text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-30 disabled:pointer-events-none shadow-sm"
                   >
                     <Send size={14} />

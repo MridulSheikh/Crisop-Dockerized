@@ -56,7 +56,7 @@ const suspiciousPatterns = [
 ];
 const aiChatFirewall = () => (0, catchAsync_1.default)((req, _res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { message } = req.body;
+    const { prompt: message } = req.body;
     if (!message || typeof message !== 'string') {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Message is required.');
     }
