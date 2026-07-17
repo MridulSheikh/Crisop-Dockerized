@@ -33,5 +33,6 @@ exports.default = {
     QDRANT_ENDPOINT: process.env.QDRANT_ENDPOINT,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     GROQ_API_KEY: process.env.GROQ_API_KEY,
-    REDIS_CONNECTION: process.env.REDIS_CONNECTION
+    REDIS_CONNECTION: process.env.REDIS_CONNECTION,
+    HF_TOKEN: process.env.HF_TOKEN
 };
