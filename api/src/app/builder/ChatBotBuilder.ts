@@ -7,8 +7,10 @@ type TUser = {
 };
 
 export const INTENTS = {
+  PRODUCT_LIST: 'PRODUCT_LIST',
   PRODUCT_DETAILS: 'PRODUCT_DETAILS',
-  GET_ORDER: 'GET_ORDER',
+  ORDER_LIST: 'ORDER_LIST',
+  TRACK_ORDER: 'TRACK_ORDER',
   CANCEL_ORDER: 'CANCEL_ORDER',
   GENERAL_QA: 'GENERAL_QA',
 } as const;
@@ -51,6 +53,9 @@ export class ChatbotBuilder {
 
   // generate Intent
   async generateIntent(): Promise<TIntentContext[]> {
+    const intents = Array.from(this.actions.values())
+      .map((action) => `- ${action.intent}`)
+      .join('\n');
     const routingResponse = await groq.chat.completions.create({
       model: groqAiModel,
 
@@ -58,108 +63,35 @@ export class ChatbotBuilder {
         {
           role: 'system',
           content: `You are an e-commerce request planner.
-    
-    Analyze the user's message and produce one or more execution contexts.
-    
-    Intent must be exactly one of:
-    
-    - PRODUCT_DETAILS
-    - GET_ORDER
-    - CANCEL_ORDER
-    - GENERAL_QA
-    
-    Rules:
-    
-    - First, correct obvious spelling mistakes, typing errors, and common grammatical mistakes.
-    - Preserve the user's original intent after correction.
-    - Normalize product names, brand names, and common e-commerce terms when possible.
-    - Split only if the user has multiple independent requests.
-    - Do NOT split simple filters, comparisons, or attributes of the same request.
-    - Extract orderId if present; otherwise return null.
-    - Never answer the user's question.
-    - Never invent products, brands, categories, or order IDs.
-    - Return valid JSON only.
-    - Do not include markdown, explanations, or extra text.
-    
-    Examples
-    
-    Input:
-    "show fis and bef"
-    
-    Output:
+
+Convert the user's message into execution contexts.
+
+${intents}
+
+Rules:
+- Fix obvious spelling and grammar without changing the user's intent.
+- Normalize product, brand, and e-commerce terms.
+- Split only independent requests.
+- Keep comparisons, filters, quantities, prices, and attributes in the same context.
+- Extract the Order ID if present; otherwise use null.
+- Do not answer the user.
+- Do not invent information.
+- Return exactly one JSON object matching the schema.
+- Do not include any explanation.
+- Do not include markdown.
+- Do not wrap the response in \`\`\` or \`\`\`json.
+- Return only raw JSON that can be parsed directly with JSON.parse().
+
+Schema:
+{
+  "contexts": [
     {
-      "contexts": [
-        {
-          "intent": "PRODUCT_DETAILS",
-          "userQuery": "show fish",
-          "orderId": null
-        },
-        {
-          "intent": "PRODUCT_DETAILS",
-          "userQuery": "show beef",
-          "orderId": null
-        }
-      ]
+      "intent": "PRODUCT_DETAILS",
+      "userQuery": "string",
+      "orderId": null
     }
-    
-    Input:
-    "show pomfrat fish under 1000"
-    
-    Output:
-    {
-      "contexts": [
-        {
-          "intent": "PRODUCT_DETAILS",
-          "userQuery": "show pomfret fish under 1000",
-          "orderId": null
-        }
-      ]
-    }
-    
-    Input:
-    "trak ordr #123"
-    
-    Output:
-    {
-      "contexts": [
-        {
-          "intent": "ORDER_DETAILS",
-          "userQuery": "track order #123",
-          "orderId": "123"
-        }
-      ]
-    }
-    
-    Input:
-    "show fish and cancle order #123"
-    
-    Output:
-    {
-      "contexts": [
-        {
-          "intent": "PRODUCT_DETAILS",
-          "userQuery": "show fish",
-          "orderId": null
-        },
-        {
-          "intent": "ORDER_DETAILS",
-          "userQuery": "cancel order #123",
-          "orderId": "123"
-        }
-      ]
-    }
-    
-    Return exactly this JSON format:
-    
-    {
-      "contexts": [
-        {
-          "intent": "PRODUCT_DETAILS",
-          "userQuery": "string",
-          "orderId": null
-        }
-      ]
-    }`,
+  ]
+}`,
         },
 
         {

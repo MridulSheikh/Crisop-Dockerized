@@ -1,23 +1,37 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Leaf, Send, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { closeChatbot } from "@/redux/features/bot/chatbotSlice";
-import { useCurrentUser } from "@/redux/features/auth/authSlice";
 import {
   useGetAllMessageQuery,
   useSendMessageMutation,
 } from "@/redux/features/bot/chatbot.api";
-import Markdown from "react-markdown";
-import { cn } from "@/lib/utils";
+import ChatMessageBubble from "./ChatMessageBubble";
+import type { ChatMessage, ChatbotApiMessageLike } from "./types";
 
-type Message = {
-  role: "user" | "assistant";
-  content: string;
+const createMessage = (role: ChatMessage["role"], content: string): ChatMessage => ({
+  id: `${role}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  role,
+  content,
+  status: "complete",
+  createdAt: new Date().toISOString(),
+});
+
+const normalizeMessages = (payload?: ChatbotApiMessageLike[] | null): ChatMessage[] => {
+  if (!Array.isArray(payload)) return [];
+
+  return payload.map((message, index) => ({
+    id: message.id ?? message._id ?? `${message.role ?? "assistant"}-${index}`,
+    role: message.role ?? "assistant",
+    content: message.content ?? "",
+    status: "complete",
+    createdAt: message.createdAt ?? new Date().toISOString(),
+  }));
 };
 
 export default function Chatbot() {
@@ -25,63 +39,66 @@ export default function Chatbot() {
   const isOpen = useSelector((state: RootState) => state.chatbot.isOpen);
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  // Safely resolve user state (assuming useCurrentUser is a selector function)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const currentUser = useSelector((state: RootState) => useCurrentUser(state));
-
-  const [messages, setMessages] = useState<Message[]>([]);
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const [sendMessage, { isLoading: sending }] = useSendMessageMutation();
-  const {
-    data: fetchAllmessage,
-    isLoading,
-    isFetching,
-    error,
-  } = useGetAllMessageQuery(undefined, {
+  const { data: fetchAllmessage, isLoading, isFetching } = useGetAllMessageQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
 
   useEffect(() => {
     if (fetchAllmessage?.data) {
-      setMessages(fetchAllmessage.data);
+      setMessages(normalizeMessages(fetchAllmessage.data));
     }
-  }, [fetchAllmessage]);
+  }, [fetchAllmessage, currentUser]);
 
-  // Scroll to bottom when messages change or when the bot is typing
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, sending]);
 
-  const handleSend = async (text: string) => {
-    if (!text.trim()) return;
+  const handleSend = useCallback(async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
 
-    const userMsg: Message = {
-      role: "user",
-      content: text,
-    };
-    setMessages((m) => [...m, userMsg]);
+    if (!currentUser) {
+      setMessages((prev) => [
+        ...prev,
+        createMessage("assistant", "Please login to use Crisop AI chat."),
+      ]);
+      setInputValue("");
+      return;
+    }
+
+    const userMessage = createMessage("user", trimmed);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
 
     try {
-      const res: any = await sendMessage({ prompt: text }).unwrap();
-      const botResponses = res?.data;
+      const res: { data?: string } = await sendMessage({ prompt: trimmed }).unwrap();
+      const botResponse = typeof res?.data === "string" && res.data.trim() !== ""
+        ? res.data
+        : "Thanks! I’m here to help.";
 
-      const botMsg: Message = {
-        role: "assistant",
-        content: botResponses,
-      };
-      setMessages((m) => [...m, botMsg]);
-    } catch (err: any) {
-      const errorMsg: Message = {
-        role: "assistant",
-        content:
-          err.data.errorMessage ||
-          "Sorry, something went wrong. Please try again later.",
-      };
-      setMessages((m) => [...m, errorMsg]);
+      setMessages((prev) => [
+        ...prev,
+        createMessage("assistant", botResponse),
+      ]);
+    } catch (err: unknown) {
+      const fallbackMessage =
+        err && typeof err === "object" && "data" in err &&
+        typeof (err as { data?: { errorMessage?: string } }).data?.errorMessage === "string"
+          ? (err as { data?: { errorMessage?: string } }).data?.errorMessage ?? "Sorry, something went wrong. Please try again later."
+          : "Sorry, something went wrong. Please try again later.";
+
+      setMessages((prev) => [
+        ...prev,
+        createMessage("assistant", fallbackMessage),
+      ]);
     }
-  };
+  }, [currentUser, sendMessage]);
+
+  const showGreeting = useMemo(() => messages.length === 0, [messages.length]);
 
   return (
     <AnimatePresence>
@@ -121,8 +138,7 @@ export default function Chatbot() {
 
           {/* Chat Timeline Body */}
           <div className="flex-1 overflow-y-auto bg-gradient-to-b from-green-50/30 to-white p-4 space-y-4 scrollbar-thin scrollbar-thumb-green-100">
-            {/* greeting ui */}
-            {messages.length <= 1 && (
+            {showGreeting && (
               <div className="flex flex-col items-center justify-center py-6 text-center animate-fade-in">
                 {/* Animated Decorative Icon */}
                 <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50 text-green-600 shadow-sm border border-green-100/50">
@@ -151,15 +167,11 @@ export default function Chatbot() {
                       type="button"
                       onClick={() => {
                         if (currentUser) {
-                          setInputValue(prompt.substring(3)); // Strips emoji for cleaner input
+                          setInputValue(prompt.substring(3));
                         } else {
                           setMessages((m) => [
                             ...m,
-                            {
-                              id: String(Date.now() + index),
-                              role: "assistant",
-                              content: "Please login to use Crisop AI chat.",
-                            },
+                            createMessage("assistant", "Please login to use Crisop AI chat."),
                           ]);
                         }
                       }}
@@ -171,198 +183,17 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "flex w-full animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
-                  message.role === "user" ? "justify-end" : "justify-start",
-                )}
-              >
-                <div className="max-w-[90%] sm:max-w-[82%] lg:max-w-[90%]">
-                  {message.content && (
-                    <div
-                      className={cn(
-                        "rounded-2xl px-4 py-2.5 shadow-sm transition-all",
-                        message.role === "user"
-                          ? "rounded-br-md bg-green-600 text-white"
-                          : "rounded-bl-md border border-gray-200 bg-white text-gray-800",
-                      )}
-                    >
-                      <Markdown
-                        components={{
-                          h1: ({ children }) => (
-                            <h1 className="mb-2 text-base font-bold">
-                              {children}
-                            </h1>
-                          ),
-
-                          h2: ({ children }) => (
-                            <h2 className="mb-2 mt-3 text-[15px] font-semibold">
-                              {children}
-                            </h2>
-                          ),
-
-                          h3: ({ children }) => (
-                            <h3 className="mb-1 mt-2 text-sm font-semibold">
-                              {children}
-                            </h3>
-                          ),
-
-                          p: ({ children }) => (
-                            <p
-                              className={cn(
-                                "text-sm leading-6 break-words [&:not(:last-child)]:mb-2",
-                                message.role === "user"
-                                  ? "text-white"
-                                  : "text-gray-700",
-                              )}
-                            >
-                              {children}
-                            </p>
-                          ),
-
-                          ul: ({ children }) => (
-                            <ul className="my-2 list-disc space-y-1 pl-5 text-sm">
-                              {children}
-                            </ul>
-                          ),
-
-                          ol: ({ children }) => (
-                            <ol className="my-2 list-decimal space-y-1 pl-5 text-sm">
-                              {children}
-                            </ol>
-                          ),
-
-                          li: ({ children }) => (
-                            <li
-                              className={cn(
-                                "leading-6",
-                                message.role === "user"
-                                  ? "text-white"
-                                  : "text-gray-700",
-                              )}
-                            >
-                              {children}
-                            </li>
-                          ),
-
-                          strong: ({ children }) => (
-                            <strong className="font-semibold">
-                              {children}
-                            </strong>
-                          ),
-
-                          em: ({ children }) => (
-                            <em className="italic">{children}</em>
-                          ),
-
-                          blockquote: ({ children }) => (
-                            <blockquote
-                              className={cn(
-                                "my-2 border-l-4 pl-3 italic text-sm",
-                                message.role === "user"
-                                  ? "border-green-300 text-green-100"
-                                  : "border-green-500 text-gray-600",
-                              )}
-                            >
-                              {children}
-                            </blockquote>
-                          ),
-
-                          code: ({ children }) => (
-                            <code
-                              className={cn(
-                                "rounded px-1.5 py-0.5 font-mono text-[13px]",
-                                message.role === "user"
-                                  ? "bg-green-700 text-white"
-                                  : "bg-gray-100 text-red-600",
-                              )}
-                            >
-                              {children}
-                            </code>
-                          ),
-
-                          pre: ({ children }) => (
-                            <pre className="my-3 overflow-x-auto rounded-xl bg-gray-900 p-3 text-[13px] text-gray-100">
-                              {children}
-                            </pre>
-                          ),
-
-                          a: ({ href, children }) => (
-                            <a
-                              href={href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={cn(
-                                "underline underline-offset-2",
-                                message.role === "user"
-                                  ? "text-green-100"
-                                  : "text-green-600 hover:text-green-700",
-                              )}
-                            >
-                              {children}
-                            </a>
-                          ),
-
-                          hr: () => <hr className="my-3 border-gray-300" />,
-
-                          table: ({ children }) => (
-                            <div className="my-3 overflow-x-auto">
-                              <table className="min-w-full border-collapse text-sm">
-                                {children}
-                              </table>
-                            </div>
-                          ),
-
-                          thead: ({ children }) => (
-                            <thead className="bg-gray-100">{children}</thead>
-                          ),
-
-                          th: ({ children }) => (
-                            <th className="border border-gray-300 px-3 py-2 text-left font-medium">
-                              {children}
-                            </th>
-                          ),
-
-                          td: ({ children }) => (
-                            <td className="border border-gray-300 px-3 py-2">
-                              {children}
-                            </td>
-                          ),
-                        }}
-                      >
-                        {message.content}
-                      </Markdown>
-                    </div>
-                  )}
-                </div>
-              </div>
+            {messages.map((message) => (
+              <ChatMessageBubble key={message.id} message={message} />
             ))}
 
             {/* Production Grade Typing Loading State */}
             {sending && (
-              <div className="flex flex-col items-start mr-auto max-w-[85%] animate-fade-in">
-                <div className="rounded-2xl rounded-tl-none bg-gray-100 border border-gray-200/50 px-4 py-3 shadow-sm flex items-center gap-1">
-                  <motion.span
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.6, delay: 0 }}
-                    className="h-1.5 w-1.5 rounded-full bg-gray-400 inline-block"
-                  />
-                  <motion.span
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 0.6,
-                      delay: 0.15,
-                    }}
-                    className="h-1.5 w-1.5 rounded-full bg-gray-400 inline-block"
-                  />
-                  <motion.span
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.6, delay: 0.3 }}
-                    className="h-1.5 w-1.5 rounded-full bg-gray-400 inline-block"
-                  />
+              <div className="flex max-w-[85%] flex-col items-start mr-auto animate-fade-in">
+                <div className="flex items-center gap-1 rounded-2xl rounded-tl-none border border-gray-200/50 bg-gray-100 px-4 py-3 shadow-sm">
+                  <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="inline-block h-1.5 w-1.5 rounded-full bg-gray-400" />
+                  <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.15 }} className="inline-block h-1.5 w-1.5 rounded-full bg-gray-400" />
+                  <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.3 }} className="inline-block h-1.5 w-1.5 rounded-full bg-gray-400" />
                 </div>
               </div>
             )}
@@ -375,24 +206,13 @@ export default function Chatbot() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (!currentUser) {
-                  setMessages((m) => [
-                    ...m,
-                    {
-                      id: String(Date.now() + 5),
-                      role: "assistant",
-                      content: "Please login to use Crisop AI chat.",
-                    },
-                  ]);
-                  return;
-                }
                 handleSend(inputValue);
               }}
               className="relative flex items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-green-500/20 focus-within:border-green-500 focus-within:bg-white transition-all duration-200"
             >
               {!currentUser ? (
                 <div className="flex w-full items-center justify-between gap-3 py-1.5">
-                  <p className="text-xs sm:text-sm text-gray-500">
+                  <p className="text-xs text-gray-500 sm:text-sm">
                     Login to start chatting with Crisop AI.
                   </p>
                   <Link
@@ -409,15 +229,19 @@ export default function Chatbot() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={
-                     isLoading? "Chat loading..." :  sending ? "Crisop AI is typing..." : "Ask Crisop AI..."
+                      isLoading || isFetching
+                        ? "Chat loading..."
+                        : sending
+                          ? "Crisop AI is typing..."
+                          : "Ask Crisop AI..."
                     }
                     className="w-full bg-transparent text-sm text-gray-700 outline-none pr-10 py-1.5 disabled:opacity-50"
-                    disabled={sending ||  isLoading}
+                    disabled={sending || isLoading || isFetching}
                   />
 
                   <button
                     type="submit"
-                    disabled={!inputValue.trim() || sending || isLoading}
+                    disabled={!inputValue.trim() || sending || isLoading || isFetching}
                     className="absolute right-2 flex h-8 w-8 items-center justify-center rounded-xl bg-green-500 text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-30 disabled:pointer-events-none shadow-sm"
                   >
                     <Send size={14} />
