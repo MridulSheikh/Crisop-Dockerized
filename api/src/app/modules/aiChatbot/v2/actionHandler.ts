@@ -243,7 +243,10 @@ You can try:
   }
 
   // normalize product
-  const aiPrompt = normalizeProduct(queryProducts);
+  const normalizedProducts = normalizeProduct(queryProducts);
+  const aiPrompt = Array.isArray(normalizedProducts)
+    ? normalizedProducts[0]
+    : normalizedProducts;
 
   const systemPrompt = `
 You are Crisop's AI shopping assistant.
@@ -268,7 +271,7 @@ Rules:
 - End with a short offer to help if appropriate.
 
 Product Data:
-${aiPrompt}
+${JSON.stringify(aiPrompt)}
 `;
 
   const response = await groq.chat.completions.create({
