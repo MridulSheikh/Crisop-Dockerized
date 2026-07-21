@@ -170,7 +170,10 @@ You can try:
 `;
     }
     // normalize product
-    const aiPrompt = (0, chat_utils_1.normalizeProduct)(queryProducts);
+    const normalizedProducts = (0, chat_utils_1.normalizeProduct)(queryProducts);
+    const aiPrompt = Array.isArray(normalizedProducts)
+        ? normalizedProducts[0]
+        : normalizedProducts;
     const systemPrompt = `
 You are Crisop's AI shopping assistant.
 
@@ -194,7 +197,7 @@ Rules:
 - End with a short offer to help if appropriate.
 
 Product Data:
-${aiPrompt}
+${JSON.stringify(aiPrompt)}
 `;
     const response = yield groq_1.groq.chat.completions.create({
         model: groq_1.groqAiModel,
