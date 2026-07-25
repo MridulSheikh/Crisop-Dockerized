@@ -6,9 +6,7 @@ import { Truck, ShieldCheck, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import HeroButtons from "./HeroButtons";
 
-/* =========================
-   DATA
-========================= */
+// bottom card data
 const BotomCardData = [
   {
     icon: Truck,
@@ -27,9 +25,7 @@ const BotomCardData = [
   },
 ];
 
-/* =========================
-   ANIMATION VARIANTS (DRY)
-========================= */
+// animation variant's
 const textVariant = {
   hidden: { opacity: 0, y: 30 },
   visible: (i = 1) => ({
@@ -56,44 +52,42 @@ const cardVariant = {
   }),
 };
 
-/* =========================
-   COMPONENT
-========================= */
+// componenet
 const Banner = () => {
   return (
-    <div className="relative overflow-hidden bg-[#f6f7f6] xl:min-h-screen flex items-center">
-      {/* 🌿 Background Glow */}
-      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-green-500/20 rounded-full blur-[120px]" />
-      <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-emerald-400/20 rounded-full blur-[120px]" />
+    <div className="relative overflow-hidden bg-[#f6f7f6] md:min-h-screen flex items-center justify-center py-8 lg:py-0">
+      {/* Background Glow */}
+      <div className="absolute -top-40 -left-40 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-green-500/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-40 right-0 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] bg-emerald-400/20 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-screen-2xl mx-auto px-5 w-full relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-4 py-16 xl:py-0 2xl:min-h-screen">
-          {/* =========================
-              LEFT CONTENT
-          ========================= */}
-          <div className="flex-1 text-center md:text-left space-y-6 md:space-y-8 w-full">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+        <div className="flex flex-col md:flex-row items-center gap-8 lg:gap-12 py-6 sm:py-10 xl:pb-0">
+          {/* Left content card */}
+          <div className="flex-1 text-center md:text-left space-y-4 lg:space-y-6 w-full">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border text-xs sm:text-sm text-green-700 font-medium">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-yellow-500/20 shadow-sm border text-xs sm:text-sm text-yellow-700 font-medium">
               🥬 Fresh Grocery Delivery
             </div>
 
             {/* Heading */}
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold leading-[1.1] text-gray-900">
-              {/* ONE LINE */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.15] text-gray-900">
+              {/* FIRST LINE */}
               <motion.div
                 custom={1}
                 variants={textVariant}
                 initial="hidden"
                 animate="visible"
-                className="flex flex-wrap md:flex-nowrap items-end gap-x-3 gap-y-2 justify-center md:justify-start"
+                className="block text-center md:text-left"
               >
-                <span className="block">Fresh & Organic</span>
+                {/* Plain Text */}
+                <span className="inline">Fresh & Organic </span>
 
-                <span className="relative block text-[#106D42]">
+                {/* Highlighted Word with Underline */}
+                <span className="relative inline-block text-[#106D42]">
                   Grocery
                   {/* ✨ marker style underline */}
                   <svg
-                    className="absolute left-0 -bottom-2 w-full h-4 md:h-5"
+                    className="absolute left-0 -bottom-1.5 w-full h-3 md:h-4 lg:h-5 pointer-events-none"
                     viewBox="0 0 200 20"
                     fill="none"
                     preserveAspectRatio="none"
@@ -114,9 +108,9 @@ const Banner = () => {
                 variants={textVariant}
                 initial="hidden"
                 animate="visible"
-                className="block mt-2"
+                className="block mt-1 sm:mt-2"
               >
-                at Your Door
+                at Your Door.
               </motion.span>
             </h1>
 
@@ -126,7 +120,7 @@ const Banner = () => {
               variants={textVariant}
               initial="hidden"
               animate="visible"
-              className="text-gray-600 text-sm sm:text-base lg:text-lg mx-auto md:mx-0 leading-relaxed max-w-xl"
+              className="text-gray-600 text-sm mx-auto md:mx-0 leading-relaxed max-w-xl"
             >
               Get fresh vegetables, fruits, dairy, and daily essentials
               delivered straight to your doorstep within hours. We ensure
@@ -135,14 +129,12 @@ const Banner = () => {
             </motion.p>
 
             {/* CTA BUTTONS */}
-            <div className="flex justify-center md:justify-start">
+            <div className="flex justify-center md:justify-start pt-2">
               <HeroButtons />
             </div>
 
-            {/* =========================
-      FEATURE CARDS
-  ========================= */}
-            <div className="hidden xl:grid xl:grid-cols-3 gap-5 pt-8">
+            {/* FEATURE CARDS */}
+            <div className="hidden xl:flex items-center gap-8 pt-6">
               {BotomCardData.map((item, i) => (
                 <motion.div
                   key={i}
@@ -150,30 +142,37 @@ const Banner = () => {
                   variants={cardVariant}
                   initial="hidden"
                   animate="visible"
-                  className="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition"
+                  className="flex items-center gap-3.5"
                 >
-                  <item.icon className="text-green-600 mb-2" />
+                  {/* Circle Green Icon Wrapper */}
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-[#106D42] text-white flex items-center justify-center">
+                    <item.icon className="w-6 h-6 stroke-[1.8]" />
+                  </div>
 
-                  <h3 className="font-semibold text-gray-900">{item.title}</h3>
-
-                  <p className="text-sm text-gray-500">{item.desc}</p>
+                  {/* Title & Description */}
+                  <div className="flex flex-col">
+                    <h3 className="font-bold text-gray-900 text-base leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 font-normal leading-normal mt-0.5">
+                      {item.desc}
+                    </p>
+                  </div>
                 </motion.div>
               ))}
             </div>
           </div>
 
-          {/* =========================
-              RIGHT IMAGE
-          ========================= */}
-          <div className="flex-1 relative w-full hidden md:block md:h-[400px] lg:h-screen">
+          {/* RIGHT IMAGE CONTAINER */}
+          <div className="flex-1 relative w-full hidden md:flex items-end justify-center self-stretch min-h-[400px] lg:min-h-screen">
             {/* glow */}
-            <div className="absolute bottom-0 w-[400px] h-[400px] bg-green-400/20 blur-[100px] rounded-full" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[300px] lg:w-[400px] h-[300px] lg:h-[400px] bg-green-400/20 blur-[100px] rounded-full pointer-events-none" />
 
             <Image
               src="/img/hero_2.png"
               alt="hero"
               fill
-              className="object-contain object-bottom"
+              className="object-contain !object-bottom"
               priority
             />
           </div>
