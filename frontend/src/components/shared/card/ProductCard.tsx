@@ -2,7 +2,7 @@
 
 import { TBrand, TProduct } from "@/types/user";
 import { getDiscountPercentage } from "@/utils/getDiscountPercentage";
-import { Eye, Heart, ShoppingCart } from "lucide-react";
+import { Eye, Heart, ShoppingCart, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -59,9 +59,20 @@ const ProductCard = ({ product }: { product: TProduct }) => {
     <div className="group rounded-md border border-gray-200 bg-white hover:shadow-[0px_4px_41px_6px_rgba(0,_0,_0,_0.1)] transition-all duration-500 overflow-hidden">
       {/* IMAGE */}
       <div className="relative overflow-hidden">
-        {discountPercentage !== 0 && (
-          <div className="bg-red-600 inline p-0.5 absolute top-0 left-0 text-white text-sm z-10">
-            -{discountPercentage}%
+        {(product.isFeatured || discountPercentage !== 0) && (
+          <div className="absolute left-2 top-2 z-10 flex flex-col items-start gap-1.5">
+            {product.isFeatured && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-200/70 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-amber-950 shadow-[0_5px_14px_rgba(217,119,6,0.35)] ring-1 ring-amber-900/10">
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Featured
+              </span>
+            )}
+
+            {discountPercentage !== 0 && (
+              <span className="inline rounded bg-red-600 px-1.5 py-0.5 text-sm text-white shadow-sm">
+                -{discountPercentage}%
+              </span>
+            )}
           </div>
         )}
 
@@ -84,7 +95,7 @@ const ProductCard = ({ product }: { product: TProduct }) => {
               src={product?.images[0]?.url}
               alt={product?.name}
               fill
-              className="object-cover object-center group-hover:scale-110 transition-transform duration-500 ease-in-out"
+              className=" object-contain object-center group-hover:scale-110 transition-transform duration-500 ease-in-out"
             />
           </div>
         </Link>

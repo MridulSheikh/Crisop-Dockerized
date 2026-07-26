@@ -328,226 +328,13 @@ const toggleFeaturedStatusService = async (id: string) => {
   };
 };
 
-// const atlasProductSearchService = async (
-//   query: string,
-//   options?: TSearchOptions,
-// ) => {
-//   const searchTerm = typeof query === 'string' ? query.trim() : '';
-
-//   // pagination
-//   const page = Math.max(1, Number(options?.page) || 1);
-//   const limit = Math.max(1, Number(options?.limit) || 10);
-//   const skip = (page - 1) * limit;
-
-//   const brandIds = parseIds(options?.brand);
-//   const categoryIds = parseIds(options?.category);
-
-//   const minPrice = Number(options?.minPrice);
-//   const maxPrice = Number(options?.maxPrice);
-
-//   const pipeline: any[] = [];
-
-//   // ======================
-//   // 🔍 SEARCH STAGE
-//   // ======================
-//   if (searchTerm) {
-//     pipeline.push({
-//       $search: {
-//         index: 'product_search_index',
-//         text: {
-//           query: searchTerm,
-//           path: ['name', 'description', 'tags'],
-//           fuzzy: { maxEdits: 1 },
-//         },
-//       },
-//     });
-//   }
-
-//   // ======================
-//   // 📦 LOOKUP (populate)
-//   // ======================
-//   pipeline.push(
-//     {
-//       $lookup: {
-//         from: 'brands',
-//         localField: 'brand',
-//         foreignField: '_id',
-//         as: 'brand',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$brand',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'categories',
-//         localField: 'category',
-//         foreignField: '_id',
-//         as: 'category',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$category',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//   );
-
-//   // ======================
-//   // 🎯 FILTER STAGE
-//   // ======================
-//   const matchStage: any = {
-//     isDeleted: { $ne: true },
-//   };
-
-//   if (brandIds.length) {
-//     matchStage['brand._id'] = { $in: brandIds };
-//   }
-
-//   if (categoryIds.length) {
-//     matchStage['category._id'] = { $in: categoryIds };
-//   }
-
-//   // price filter
-//   if (!isNaN(minPrice) || !isNaN(maxPrice)) {
-//     matchStage.price = {};
-
-//     if (!isNaN(minPrice)) {
-//       matchStage.price.$gte = minPrice;
-//     }
-
-//     if (!isNaN(maxPrice)) {
-//       matchStage.price.$lte = maxPrice;
-//     }
-//   }
-
-//   pipeline.push({
-//     $match: matchStage,
-//   });
-
-
-//   // ======================
-//   // 📊 RANKING
-//   // ======================
-//   if (searchTerm) {
-//     pipeline.push({
-//       $addFields: {
-//         score: { $meta: 'searchScore' },
-//       },
-//     });
-
-//     pipeline.push({
-//       $sort: {
-//         score: -1,
-//         createdAt: -1,
-//       },
-//     });
-//   } else {
-//     pipeline.push({
-//       $sort: {
-//         createdAt: -1,
-//       },
-//     });
-//   }
-
-//   // ======================
-//   // 📄 PAGINATION
-//   // ======================
-//   pipeline.push({ $skip: skip }, { $limit: limit });
-
-//   // ======================
-//   // 🚀 DATA
-//   // ======================
-
-//   const data = await Product.aggregate(pipeline);
-
-//   // ======================
-//   // 📊 TOTAL COUNT
-//   // ======================
-//   const countPipeline: any[] = [];
-
-//   if (searchTerm) {
-//     countPipeline.push({
-//       $search: {
-//         index: 'product_search_index',
-//         text: {
-//           query: searchTerm,
-//           path: ['name', 'description', 'tags'],
-//           fuzzy: { maxEdits: 1 },
-//         },
-//       },
-//     });
-//   }
-
-//   countPipeline.push(
-//     {
-//       $lookup: {
-//         from: 'brands',
-//         localField: 'brand',
-//         foreignField: '_id',
-//         as: 'brand',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$brand',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'categories',
-//         localField: 'category',
-//         foreignField: '_id',
-//         as: 'category',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$category',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     {
-//       $match: {
-//         isDeleted: { $ne: true },
-//         ...(brandIds.length && { brand: { $in: brandIds } }),
-//         ...(categoryIds.length && { category: { $in: categoryIds } }),
-//       },
-//     },
-//     {
-//       $count: 'total',
-//     },
-//   );
-
-//   const totalAgg = await Product.aggregate(countPipeline);
-
-//   const total = totalAgg[0]?.total || 0;
-
-//   return {
-//     meta: {
-//       total,
-//       page,
-//       limit,
-//       totalPages: Math.ceil(total / limit),
-//     },
-//     data,
-//   };
-// };
-
 const atlasProductSearchService = async (
   query: string,
   options?: TSearchOptions,
 ) => {
   const searchTerm = typeof query === 'string' ? query.trim() : '';
 
-  // ======================
-  // 📄 Pagination
-  // ======================
+  // Pagination
   const page = Math.max(1, Number(options?.page) || 1);
   const limit = Math.max(1, Number(options?.limit) || 10);
   const skip = (page - 1) * limit;
@@ -557,6 +344,7 @@ const atlasProductSearchService = async (
 
   const minPrice = Number(options?.minPrice);
   const maxPrice = Number(options?.maxPrice);
+  const featured = options?.featured === true || options?.featured === 'true';
 
   const pipeline: any[] = [];
   const baseVisibilityMatch = {
@@ -564,9 +352,7 @@ const atlasProductSearchService = async (
     isPublished: { $ne: false },
   };
 
-  // ======================
-  // 🔍 Search
-  // ======================
+  //  Search
   if (searchTerm) {
     pipeline.push({
       $search: {
@@ -586,9 +372,8 @@ const atlasProductSearchService = async (
     $match: baseVisibilityMatch,
   });
 
-  // ======================
-  // 📦 Populate Brand & Category
-  // ======================
+
+  //  Populate Brand & Category
   pipeline.push(
     {
       $lookup: {
@@ -620,9 +405,7 @@ const atlasProductSearchService = async (
     },
   );
 
-  // ======================
-  // 🎯 Filters
-  // ======================
+  // Filters
   const matchStage: any = {};
 
   if (brandIds.length) {
@@ -649,13 +432,16 @@ const atlasProductSearchService = async (
     }
   }
 
+  if (featured) {
+    matchStage.isFeatured = true;
+  }
+
   pipeline.push({
     $match: matchStage,
   });
 
-  // ======================
-  // 📊 Ranking
-  // ======================
+
+  // Ranking
   if (searchTerm) {
     pipeline.push(
       {
@@ -680,9 +466,7 @@ const atlasProductSearchService = async (
     });
   }
 
-  // ======================
-  // 📄 Pagination
-  // ======================
+  // Pagination
   pipeline.push(
     {
       $skip: skip,
@@ -692,16 +476,13 @@ const atlasProductSearchService = async (
     },
   );
 
-  // ======================
-  // 🚀 Fetch Data
-  // ======================
+
+  // Fetch Data
   const data = (await Product.aggregate(pipeline)).filter(
     (product) => product.isDeleted !== true && product.isPublished !== false,
   );
 
-  // ======================
-  // 📊 Count Pipeline
-  // ======================
+  // Count Pipeline
   const countPipeline: any[] = [];
 
   if (searchTerm) {
@@ -772,6 +553,7 @@ const atlasProductSearchService = async (
             ...(!isNaN(maxPrice) && { $lte: maxPrice }),
           },
         }),
+        ...(featured && { isFeatured: true }),
       },
     },
     {

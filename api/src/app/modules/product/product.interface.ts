@@ -28,4 +28,5 @@ export type TSearchOptions = {
   brand?: string;
   minPrice?: string;
   maxPrice?: string;
+  featured?: string | boolean;
 };

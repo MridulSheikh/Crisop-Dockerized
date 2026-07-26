@@ -120,7 +120,7 @@ export default function Banner() {
             </div>
 
             <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="relative hidden min-h-[400px] w-full flex-1 items-end justify-center self-stretch md:flex lg:min-h-screen">
-              <div className="pointer-events-none absolute bottom-0 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-green-400/20 blur-[100px] lg:h-[400px] lg:w-[400px]" />
+              {/* <div className="pointer-events-none absolute bottom-0 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-green-400/20 blur-[100px] lg:h-[400px] lg:w-[400px]" /> */}
               <Image src={slide.image} alt={slide.imageAlt} fill priority={activeSlide === 0} className="!object-bottom object-contain" />
             </motion.div>
           </motion.div>

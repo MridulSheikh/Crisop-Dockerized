@@ -104,7 +104,7 @@ const AboutUs = () => {
   return (
     <section
       id="about-us"
-      className="relative overflow-hidden py-20 md:py-32 px-5"
+      className="relative overflow-hidden py-20 md:pt-32 px-5"
     >
 
       {/* Background Glow */}
