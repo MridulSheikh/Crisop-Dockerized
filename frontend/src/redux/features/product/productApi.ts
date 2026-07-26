@@ -24,19 +24,31 @@ export const productApi = baseApi.injectEndpoints({
 
     getProduct: builder.query<
       TProductBuilderQueries,
-      { page?: number; search?: string; limit?: number }
+      { page?: number; search?: string; limit?: number; featured?: boolean }
     >({
-      query: ({ page = 1, search = "", limit = 10 }) => {
+      query: ({ page = 1, search = "", limit = 10, featured }) => {
         const params = new URLSearchParams();
         params.append("page", page.toString());
         params.append("limit", limit.toString());
         if (search) params.append("searchTerm", search);
+        if (featured !== undefined) params.append("featured", String(featured));
 
         return {
           url: `/product?${params.toString()}`,
           method: "GET",
         };
       },
+      providesTags: ["products"],
+    }),
+
+    getFeaturedProducts: builder.query<
+      TProductBuilderQueries,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 8 } = {}) => ({
+        url: `/product?page=${page}&limit=${limit}&featured=true`,
+        method: "GET",
+      }),
       providesTags: ["products"],
     }),
 
@@ -84,6 +96,7 @@ export const productApi = baseApi.injectEndpoints({
 export const {
   useGetAdminProductQuery,
   useGetProductQuery,
+  useGetFeaturedProductsQuery,
   useCreateProductMutation,
   useDeleteProductMutation,
   useUpdateProductMutation,

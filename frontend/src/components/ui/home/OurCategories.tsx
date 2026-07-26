@@ -2,13 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 import { motion } from "framer-motion";
 
-/* =========================
-   DATA
-========================= */
+
+// Data
 const categories = [
   {
     name: "Vegetables",
@@ -30,9 +28,7 @@ const categories = [
   },
 ];
 
-/* =========================
-   REUSABLE ANIMATION
-========================= */
+//REUSABLE ANIMATION
 const fadeUpVariant = {
   hidden: {
     opacity: 0,
@@ -49,9 +45,7 @@ const fadeUpVariant = {
   }),
 };
 
-/* =========================
-   REUSABLE CARD
-========================= */
+//REUSABLE CARD
 const CategoryCard = ({
   item,
   className,
@@ -101,14 +95,12 @@ const CategoryCard = ({
   );
 };
 
-/* =========================
-   COMPONENT
-========================= */
+// COMPONENT
 const OurCategories = () => {
   return (
     <section
       id="categories"
-      className="max-w-screen-2xl mx-auto px-5 mt-10 md:mt-28"
+      className="max-w-screen-2xl mx-auto px-5 mt-10"
     >
       {/* HEADER */}
       <motion.div

@@ -265,197 +265,10 @@ const toggleFeaturedStatusService = (id) => __awaiter(void 0, void 0, void 0, fu
     };
 });
 exports.toggleFeaturedStatusService = toggleFeaturedStatusService;
-// const atlasProductSearchService = async (
-//   query: string,
-//   options?: TSearchOptions,
-// ) => {
-//   const searchTerm = typeof query === 'string' ? query.trim() : '';
-//   // pagination
-//   const page = Math.max(1, Number(options?.page) || 1);
-//   const limit = Math.max(1, Number(options?.limit) || 10);
-//   const skip = (page - 1) * limit;
-//   const brandIds = parseIds(options?.brand);
-//   const categoryIds = parseIds(options?.category);
-//   const minPrice = Number(options?.minPrice);
-//   const maxPrice = Number(options?.maxPrice);
-//   const pipeline: any[] = [];
-//   // ======================
-//   // 🔍 SEARCH STAGE
-//   // ======================
-//   if (searchTerm) {
-//     pipeline.push({
-//       $search: {
-//         index: 'product_search_index',
-//         text: {
-//           query: searchTerm,
-//           path: ['name', 'description', 'tags'],
-//           fuzzy: { maxEdits: 1 },
-//         },
-//       },
-//     });
-//   }
-//   // ======================
-//   // 📦 LOOKUP (populate)
-//   // ======================
-//   pipeline.push(
-//     {
-//       $lookup: {
-//         from: 'brands',
-//         localField: 'brand',
-//         foreignField: '_id',
-//         as: 'brand',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$brand',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'categories',
-//         localField: 'category',
-//         foreignField: '_id',
-//         as: 'category',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$category',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//   );
-//   // ======================
-//   // 🎯 FILTER STAGE
-//   // ======================
-//   const matchStage: any = {
-//     isDeleted: { $ne: true },
-//   };
-//   if (brandIds.length) {
-//     matchStage['brand._id'] = { $in: brandIds };
-//   }
-//   if (categoryIds.length) {
-//     matchStage['category._id'] = { $in: categoryIds };
-//   }
-//   // price filter
-//   if (!isNaN(minPrice) || !isNaN(maxPrice)) {
-//     matchStage.price = {};
-//     if (!isNaN(minPrice)) {
-//       matchStage.price.$gte = minPrice;
-//     }
-//     if (!isNaN(maxPrice)) {
-//       matchStage.price.$lte = maxPrice;
-//     }
-//   }
-//   pipeline.push({
-//     $match: matchStage,
-//   });
-//   // ======================
-//   // 📊 RANKING
-//   // ======================
-//   if (searchTerm) {
-//     pipeline.push({
-//       $addFields: {
-//         score: { $meta: 'searchScore' },
-//       },
-//     });
-//     pipeline.push({
-//       $sort: {
-//         score: -1,
-//         createdAt: -1,
-//       },
-//     });
-//   } else {
-//     pipeline.push({
-//       $sort: {
-//         createdAt: -1,
-//       },
-//     });
-//   }
-//   // ======================
-//   // 📄 PAGINATION
-//   // ======================
-//   pipeline.push({ $skip: skip }, { $limit: limit });
-//   // ======================
-//   // 🚀 DATA
-//   // ======================
-//   const data = await Product.aggregate(pipeline);
-//   // ======================
-//   // 📊 TOTAL COUNT
-//   // ======================
-//   const countPipeline: any[] = [];
-//   if (searchTerm) {
-//     countPipeline.push({
-//       $search: {
-//         index: 'product_search_index',
-//         text: {
-//           query: searchTerm,
-//           path: ['name', 'description', 'tags'],
-//           fuzzy: { maxEdits: 1 },
-//         },
-//       },
-//     });
-//   }
-//   countPipeline.push(
-//     {
-//       $lookup: {
-//         from: 'brands',
-//         localField: 'brand',
-//         foreignField: '_id',
-//         as: 'brand',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$brand',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'categories',
-//         localField: 'category',
-//         foreignField: '_id',
-//         as: 'category',
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: '$category',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     {
-//       $match: {
-//         isDeleted: { $ne: true },
-//         ...(brandIds.length && { brand: { $in: brandIds } }),
-//         ...(categoryIds.length && { category: { $in: categoryIds } }),
-//       },
-//     },
-//     {
-//       $count: 'total',
-//     },
-//   );
-//   const totalAgg = await Product.aggregate(countPipeline);
-//   const total = totalAgg[0]?.total || 0;
-//   return {
-//     meta: {
-//       total,
-//       page,
-//       limit,
-//       totalPages: Math.ceil(total / limit),
-//     },
-//     data,
-//   };
-// };
 const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const searchTerm = typeof query === 'string' ? query.trim() : '';
-    // ======================
-    // 📄 Pagination
-    // ======================
+    // Pagination
     const page = Math.max(1, Number(options === null || options === void 0 ? void 0 : options.page) || 1);
     const limit = Math.max(1, Number(options === null || options === void 0 ? void 0 : options.limit) || 10);
     const skip = (page - 1) * limit;
@@ -463,14 +276,13 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
     const categoryIds = (0, parseIds_1.parseIds)(options === null || options === void 0 ? void 0 : options.category);
     const minPrice = Number(options === null || options === void 0 ? void 0 : options.minPrice);
     const maxPrice = Number(options === null || options === void 0 ? void 0 : options.maxPrice);
+    const featured = (options === null || options === void 0 ? void 0 : options.featured) === true || (options === null || options === void 0 ? void 0 : options.featured) === 'true';
     const pipeline = [];
     const baseVisibilityMatch = {
         isDeleted: { $ne: true },
         isPublished: { $ne: false },
     };
-    // ======================
-    // 🔍 Search
-    // ======================
+    //  Search
     if (searchTerm) {
         pipeline.push({
             $search: {
@@ -488,9 +300,7 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
     pipeline.push({
         $match: baseVisibilityMatch,
     });
-    // ======================
-    // 📦 Populate Brand & Category
-    // ======================
+    //  Populate Brand & Category
     pipeline.push({
         $lookup: {
             from: 'brands',
@@ -516,9 +326,7 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
             preserveNullAndEmptyArrays: true,
         },
     });
-    // ======================
-    // 🎯 Filters
-    // ======================
+    // Filters
     const matchStage = {};
     if (brandIds.length) {
         matchStage['brand._id'] = {
@@ -539,12 +347,13 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
             matchStage.price.$lte = maxPrice;
         }
     }
+    if (featured) {
+        matchStage.isFeatured = true;
+    }
     pipeline.push({
         $match: matchStage,
     });
-    // ======================
-    // 📊 Ranking
-    // ======================
+    // Ranking
     if (searchTerm) {
         pipeline.push({
             $addFields: {
@@ -566,21 +375,15 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
             },
         });
     }
-    // ======================
-    // 📄 Pagination
-    // ======================
+    // Pagination
     pipeline.push({
         $skip: skip,
     }, {
         $limit: limit,
     });
-    // ======================
-    // 🚀 Fetch Data
-    // ======================
+    // Fetch Data
     const data = (yield product_model_1.default.aggregate(pipeline)).filter((product) => product.isDeleted !== true && product.isPublished !== false);
-    // ======================
-    // 📊 Count Pipeline
-    // ======================
+    // Count Pipeline
     const countPipeline = [];
     if (searchTerm) {
         countPipeline.push({
@@ -624,7 +427,7 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
             preserveNullAndEmptyArrays: true,
         },
     }, {
-        $match: Object.assign(Object.assign(Object.assign({}, (brandIds.length && {
+        $match: Object.assign(Object.assign(Object.assign(Object.assign({}, (brandIds.length && {
             'brand._id': {
                 $in: brandIds,
             },
@@ -634,7 +437,7 @@ const atlasProductSearchService = (query, options) => __awaiter(void 0, void 0, 
             },
         })), ((!isNaN(minPrice) || !isNaN(maxPrice)) && {
             price: Object.assign(Object.assign({}, (!isNaN(minPrice) && { $gte: minPrice })), (!isNaN(maxPrice) && { $lte: maxPrice })),
-        })),
+        })), (featured && { isFeatured: true })),
     }, {
         $count: 'total',
     });
