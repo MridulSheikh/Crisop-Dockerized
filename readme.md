@@ -1,4 +1,4 @@
-# Crisop Docker Monorepo
+# Crisop
 
 ## Overview
 
