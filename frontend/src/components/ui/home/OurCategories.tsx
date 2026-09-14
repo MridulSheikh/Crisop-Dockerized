@@ -100,7 +100,7 @@ const OurCategories = () => {
   return (
     <section
       id="categories"
-      className="max-w-screen-2xl mx-auto px-5 mt-10"
+      className="max-w-screen-2xl mx-auto px-5 mt-24"
     >
       {/* HEADER */}
       <motion.div

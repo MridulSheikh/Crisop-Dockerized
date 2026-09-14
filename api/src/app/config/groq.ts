@@ -5,4 +5,4 @@ export const groq = new Groq({
   apiKey: config.GROQ_API_KEY
 });
 
-export const groqAiModel =  "llama-3.3-70b-versatile"
+export const groqAiModel =  "openai/gpt-oss-20b"

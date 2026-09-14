@@ -81,10 +81,9 @@ const FeaturedProducts = () => {
   return (
     <section
       id="featured-products"
-      className="relative overflow-hidden bg-gradient-to-b from-gray-50/50 via-white to-white py-16 md:py-24"
+      className="relative overflow-hidden bg-[#f6f7f6] py-16 md:py-20 mt-20"
     >
       {/* Background Decoratives */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       <div className="pointer-events-none absolute -left-20 top-1/4 h-96 w-96 rounded-full bg-emerald-200/20 blur-[120px]" />
       <div className="pointer-events-none absolute -right-20 bottom-1/4 h-96 w-96 rounded-full bg-lime-200/20 blur-[120px]" />
 
@@ -106,7 +105,8 @@ const FeaturedProducts = () => {
               Featured Products
             </h2>
             <p className="text-sm text-gray-600 sm:text-base">
-              Discover our top-rated favorites and daily essentials selected for quality, sustainability, and value.
+              Discover our top-rated favorites and daily essentials selected for
+              quality, sustainability, and value.
             </p>
           </div>
         </motion.div>
@@ -165,8 +165,43 @@ const FeaturedProducts = () => {
               </CarouselContent>
 
               {/* Navigation Controls */}
-              <CarouselPrevious className="-left-4 sm:-left-5 lg:-left-6 top-1/2 h-11 w-11 -translate-y-1/2 border-gray-200/80 bg-white/90 shadow-lg backdrop-blur-sm hover:bg-emerald-600 hover:text-white transition-all disabled:opacity-0" />
-              <CarouselNext className="-right-4 sm:-right-5 lg:-right-6 top-1/2 h-11 w-11 -translate-y-1/2 border-gray-200/80 bg-white/90 shadow-lg backdrop-blur-sm hover:bg-emerald-600 hover:text-white transition-all disabled:opacity-0" />
+              <CarouselPrevious
+  className="
+    left-4 top-1/2 h-11 w-11 -translate-y-1/2
+    rounded-full
+    border border-gray-900/10
+    bg-gray-900/90
+    text-white
+    shadow-xl shadow-gray-900/20
+    backdrop-blur-md
+    transition-all duration-300
+    hover:-translate-y-1/2
+    hover:scale-110
+    hover:border-emerald-400
+    hover:bg-emerald-600
+    hover:shadow-lg hover:shadow-emerald-500/25
+    disabled:opacity-0
+  "
+/>
+
+<CarouselNext
+  className="
+    right-4 top-1/2 h-11 w-11 -translate-y-1/2
+    rounded-full
+    border border-gray-900/10
+    bg-gray-900/90
+    text-white
+    shadow-xl shadow-gray-900/20
+    backdrop-blur-md
+    transition-all duration-300
+    hover:-translate-y-1/2
+    hover:scale-110
+    hover:border-emerald-400
+    hover:bg-emerald-600
+    hover:shadow-lg hover:shadow-emerald-500/25
+    disabled:opacity-0
+  "
+/>
             </Carousel>
 
             {/* Pagination Indicators */}
@@ -194,7 +229,8 @@ const FeaturedProducts = () => {
               New favorites arriving soon
             </h3>
             <p className="mt-2 text-sm text-gray-500">
-              We&apos;re currently restocking our featured list. Check back soon or explore our full catalog.
+              We&apos;re currently restocking our featured list. Check back soon
+              or explore our full catalog.
             </p>
             <Link
               href="/shop"
