@@ -1,8 +1,26 @@
 # Crisop
 
+<p align="center">
+  <img
+    src="./frontend/public/img/md-banner.png"
+    alt="Crisop - Full Stack E-commerce Platform"
+    width="100%"
+  />
+</p>
+
+<p align="center">
+  <strong>Modern Full-Stack Grocery E-commerce Platform with AI Chatbot</strong>
+</p>
+
+<p align="center">
+  Next.js • Express.js • TypeScript • MongoDB • Redis • Docker • AI
+</p>
+
 ## Overview
 
 This repository contains a full-stack e-commerce application with a Next.js frontend and a TypeScript + Express backend, orchestrated by Docker Compose. The project includes inventory management, product catalog, order flow, user authentication, admin/dashboard features, and a chat/AI integration.
+
+
 
 ## Services
 
@@ -115,15 +133,21 @@ Common environment variables include:
 
 ### Backend
 
+- `cd ./api`
 - `npm run start:dev` - Run backend in development mode
 - `npm run build` - Compile TypeScript
 - `npm run start:prod` - Run production build
 
 ### Frontend
 
+- `cd ./frontend`
 - `npm run dev` - Start Next.js development server
 - `npm run build` - Build frontend for production
 - `npm run start` - Start frontend production server
+
+### Docker
+
+- `docker compose up --watch`
 
 ## Author
 

@@ -13,7 +13,7 @@ export default function HeroButtons() {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center md:justify-start pt-2 w-full sm:w-auto">
       
-      {/* Primary Shop Button */}
+      {/* primary shop button */}
       <Link href="/shop" className="w-full sm:w-auto">
         <motion.div
           whileHover={{ scale: 1.02 }}
@@ -22,7 +22,7 @@ export default function HeroButtons() {
         >
           <Button className="group relative w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 bg-gradient-to-r from-[#106D42] via-emerald-600 to-teal-600 hover:from-[#0d5936] hover:to-teal-700 text-white font-medium text-base rounded-2xl shadow-lg shadow-emerald-900/20 hover:shadow-emerald-600/30 transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden border border-emerald-400/30">
             
-            {/* Light Sweep/Shimmer Effect */}
+            {/* light effects */}
             <div className="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-out" />
 
             <ShoppingBag className="w-5 h-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110" />
@@ -34,7 +34,7 @@ export default function HeroButtons() {
         </motion.div>
       </Link>
 
-      {/* AI Assistant Button */}
+      {/* chatbot button */}
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}

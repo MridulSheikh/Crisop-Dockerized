@@ -19,9 +19,7 @@ const features = [
   },
 ];
 
-/* =========================
-   MODERN ANIMATION VARIANTS
-========================= */
+// Animation varient
 
 const containerVariant = {
   hidden: {},

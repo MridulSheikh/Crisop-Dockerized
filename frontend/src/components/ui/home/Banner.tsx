@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, ShieldCheck, Truck } from "lucide-react";
+import {  Clock, ShieldCheck, Truck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import HeroButtons from "./HeroButtons";
 

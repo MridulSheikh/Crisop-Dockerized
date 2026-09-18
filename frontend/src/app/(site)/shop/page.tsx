@@ -111,7 +111,7 @@ const Products = async ({
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center w-full h-full">
                 {/* illustration */}
-                <div className="w-40 h-40 mb-6 opacity-80">
+                <div className="w-40 h-40 mb-6 opacity-80 relative">
                   <Image
                     src="/img/product-not-found.png"
                     alt="No products"

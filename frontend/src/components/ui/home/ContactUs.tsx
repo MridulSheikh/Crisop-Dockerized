@@ -85,8 +85,6 @@ const Contact = () => {
     <section className="pb-24 bg-gradient-to-b from-white to-green-50" id="contact">
       <div className="mt-10 md:mt-28 max-w-screen-2xl px-5 mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
-          
-          {/* LEFT */}
           <motion.div
             ref={ref}
             initial={{ x: -80, opacity: 0 }}
@@ -116,8 +114,6 @@ const Contact = () => {
               ))}
             </div>
           </motion.div>
-
-          {/* RIGHT FORM */}
           <motion.div
             initial={{ x: 80, opacity: 0 }}
             animate={inView ? { x: 0, opacity: 1 } : {}}
@@ -149,8 +145,6 @@ const Contact = () => {
                   />
                 </div>
               </div>
-
-              {/* STATUS */}
               <div className="mt-5 space-y-3">
                 {responseError && (
                   <StatusBox
@@ -206,8 +200,6 @@ const Contact = () => {
 };
 
 export default Contact;
-
-/* 🔥 Reusable Components */
 
 const InputField = ({ label, register }: {label: string, register: UseFormRegisterReturn}) => (
   <div>

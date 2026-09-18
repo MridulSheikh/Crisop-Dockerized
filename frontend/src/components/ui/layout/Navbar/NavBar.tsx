@@ -19,9 +19,8 @@ import {
   ShoppingCart,
 } from "lucide-react";
 
-/* =========================
-   DATA
-========================= */
+
+// link data
 
 const navigationData = [
   { name: "Shop", link: "/shop", isAdminRoute: false },
@@ -37,9 +36,7 @@ const bottomNav = [
 
 const AdminAllowedRoles = ["admin", "manager", "super"];
 
-/* =========================
-   ANIMATION VARIANTS
-========================= */
+// animation variants
 
 const navbarVariant = {
   hidden: {
@@ -86,9 +83,7 @@ const bottomNavVariant = {
   },
 };
 
-/* =========================
-   COMPONENT
-========================= */
+// component
 
 const NavBar = () => {
   const [serchBarFocus, setSerchBarFocus] = useState(false);
@@ -111,9 +106,8 @@ const NavBar = () => {
 
   const [showSearch, setShowSearch] = useState(false);
 
-  /* =========================
-     MOBILE DETECT
-  ========================= */
+
+  // detect mobile screen size
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -127,9 +121,8 @@ const NavBar = () => {
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
 
-  /* =========================
-     SCROLL EFFECT
-  ========================= */
+  
+  // scroll effect
 
   useEffect(() => {
     const currentScrollY = window.scrollY;
@@ -160,9 +153,9 @@ const NavBar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isHome]);
 
-  /* =========================
-     SEARCH FOCUS
-  ========================= */
+
+   
+  // search focus
 
   const handleFocus = () => {
     if (isMobile) setSerchBarFocus(true);
@@ -174,10 +167,6 @@ const NavBar = () => {
 
   return (
     <>
-      {/* =========================
-          NAVBAR
-      ========================= */}
-
       <AnimatePresence>
         {showNavbar && (
           <motion.div
@@ -198,7 +187,7 @@ const NavBar = () => {
 
               <div className="flex items-center py-3 lg:py-4 gap-x-3">
 
-                {/* ================= LOGO ================= */}
+               {/* logo */}
 
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -224,7 +213,7 @@ const NavBar = () => {
                   </Link>
                 </motion.div>
 
-                {/* ================= SEARCH ================= */}
+                {/* search bar  */}
 
                 {showSearch && (
                   <motion.div
@@ -244,7 +233,7 @@ const NavBar = () => {
                   </motion.div>
                 )}
 
-                {/* ================= RIGHT SIDE ================= */}
+                {/* right side  */}
 
                 <div
                   className={cn(
@@ -255,7 +244,7 @@ const NavBar = () => {
                   )}
                 >
 
-                  {/* NAV LINKS */}
+                  {/* nav links */}
 
                   <ul className="hidden md:flex items-center gap-x-6">
                     {navigationData.map((item, i) => (
@@ -295,7 +284,7 @@ const NavBar = () => {
                     ))}
                   </ul>
 
-                  {/* WISHLIST */}
+                 {/* wishlist  */}
 
                   <motion.div
                     whileHover={{ y: -2 }}
@@ -318,7 +307,7 @@ const NavBar = () => {
                     </Link>
                   </motion.div>
 
-                  {/* CART */}
+                  {/* cart */}
 
                   <motion.div
                     whileHover={{ y: -2 }}
@@ -341,7 +330,7 @@ const NavBar = () => {
                     </Link>
                   </motion.div>
 
-                  {/* USER */}
+                  {/* user  */}
 
                   {user ? (
                     <motion.div
@@ -373,9 +362,7 @@ const NavBar = () => {
         )}
       </AnimatePresence>
 
-      {/* =========================
-          MOBILE BOTTOM NAV
-      ========================= */}
+      {/* mobile bottom nav  */}
 
       <motion.div
         variants={bottomNavVariant}
@@ -460,7 +447,7 @@ const NavBar = () => {
         </div>
       </motion.div>
 
-      {/* SPACING */}
+       {/* spacing  */}
       <div className="h-16 md:hidden" />
     </>
   );

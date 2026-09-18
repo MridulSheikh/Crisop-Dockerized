@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
-import { Button } from "../button";
-import { Search, Loader2, X, Link, ArrowUpLeft } from "lucide-react";
+import { Search, Loader2, X, ArrowUpLeft } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { TProduct } from "@/types/user";
 import { useGetProductQuery } from "@/redux/features/product/productApi";

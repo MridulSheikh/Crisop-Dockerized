@@ -102,11 +102,9 @@ const CustomerReviews = () => {
 
   return (
     <section className="relative overflow-hidden bg-slate-50/50 py-16 md:py-24">
-      {/* Subtle Background Accent Lines */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e2e8f012_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f012_1px,transparent_1px)] bg-[size:32px_32px]" />
 
       <div className="relative mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -125,7 +123,6 @@ const CustomerReviews = () => {
           </p>
         </motion.div>
 
-        {/* Social Proof Trust Badge */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}

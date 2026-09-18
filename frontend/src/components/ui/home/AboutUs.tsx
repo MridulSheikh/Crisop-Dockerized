@@ -5,9 +5,7 @@ import { CircleHelp, Package, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
 
-/* =========================
-   DATA
-========================= */
+// Features Data
 const features = [
   {
     icon: ShieldCheck,
@@ -26,10 +24,7 @@ const features = [
   },
 ];
 
-/* =========================
-   ANIMATION VARIANTS
-========================= */
-
+// Animation varient
 const containerVariant = {
   hidden: {},
   visible: {
@@ -89,9 +84,6 @@ const imageVariant = {
   },
 };
 
-/* =========================
-   COMPONENT
-========================= */
 
 const AboutUs = () => {
   const ref = useRef(null);
@@ -107,7 +99,7 @@ const AboutUs = () => {
       className="relative overflow-hidden py-20 md:pt-32 px-5"
     >
 
-      {/* Background Glow */}
+      {/* Gradient background */}
       <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-emerald-300/10 rounded-full blur-[120px]" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-green-300/10 rounded-full blur-[120px]" />
 
@@ -115,7 +107,7 @@ const AboutUs = () => {
 
         <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
 
-          {/* ================= LEFT ================= */}
+          {/* Left side */}
           <motion.div
             ref={ref}
             variants={containerVariant}
@@ -162,17 +154,15 @@ const AboutUs = () => {
                   className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-xl transition-all duration-500"
                 >
 
-                  {/* hover glow */}
+                  {/* hover */}
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/40 to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
 
                   <div className="relative flex gap-4">
 
-                    {/* Icon */}
                     <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
                       <item.icon size={22} />
                     </div>
 
-                    {/* Text */}
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">
                         {item.title}
@@ -192,7 +182,7 @@ const AboutUs = () => {
 
           </motion.div>
 
-          {/* ================= RIGHT IMAGE ================= */}
+          {/* Right side */}
           <motion.div
             variants={imageVariant}
             initial="hidden"

@@ -30,7 +30,6 @@ const LimitSelectClient = () => {
 
     router.push(`?${params.toString()}`);
     router.refresh()
-    console.log("hitted")
   };
 
   return (

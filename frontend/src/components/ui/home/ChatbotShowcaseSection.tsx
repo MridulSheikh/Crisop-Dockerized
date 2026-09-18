@@ -67,15 +67,15 @@ const CrisopAISection = () => {
     animationStarted.current = true;
 
     const startAnimation = async () => {
-      // User message appears
+     
       await new Promise((resolve) => setTimeout(resolve, 700));
       setShowUserMessage(true);
 
-      // AI thinking starts
+     
       await new Promise((resolve) => setTimeout(resolve, 900));
       setIsThinking(true);
 
-      // AI finishes thinking
+      
       await new Promise((resolve) => setTimeout(resolve, 1800));
       setIsThinking(false);
       setShowAIMessage(true);
@@ -89,7 +89,6 @@ const CrisopAISection = () => {
         );
       }
 
-      // Products appear
       await new Promise((resolve) => setTimeout(resolve, 500));
       setShowProducts(true);
     };
@@ -100,7 +99,7 @@ const CrisopAISection = () => {
   return (
     <section className="relative overflow-hidden bg-white py-24">
       <div className="relative mx-auto container px-6 lg:px-8">
-        {/* Header */}
+        {/* header  */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -209,14 +208,14 @@ const CrisopAISection = () => {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="relative"
           >
-            {/* Glow */}
+           
             <div className="absolute -inset-6 rounded-[2.5rem] bg-emerald-100/50 blur-3xl" />
 
             <div className="relative overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-[0_25px_80px_rgba(15,23,42,0.10)]">
-              {/* Chat Header */}
+              
               <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
                 <div className="flex items-center gap-3">
-                  {/* AI Avatar */}
+                 
                   <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white">
                     <Bot size={20} />
 
@@ -291,7 +290,6 @@ const CrisopAISection = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Thinking Indicator */}
                 <AnimatePresence>
                   {isThinking && (
                     <motion.div
@@ -331,7 +329,6 @@ const CrisopAISection = () => {
                   )}
                 </AnimatePresence>
 
-                {/* AI Response */}
                 <AnimatePresence>
                   {showAIMessage && (
                     <motion.div
@@ -363,15 +360,15 @@ const CrisopAISection = () => {
                         <Bot size={15} />
                       </motion.div>
 
-                      {/* AI Bubble */}
+                  
                       <div className="max-w-[88%] rounded-2xl rounded-tl-md border border-gray-100 bg-white px-4 py-3 shadow-sm">
-                        {/* Typing Text */}
+                 
                         <div className="flex items-start gap-1">
                           <p className="text-sm leading-6 text-gray-600">
                             {typedText}
                           </p>
 
-                          {/* Typing Cursor */}
+                    
                           {typedText.length < responseText.length && (
                             <motion.span
                               animate={{
@@ -386,7 +383,6 @@ const CrisopAISection = () => {
                           )}
                         </div>
 
-                        {/* Product Recommendations */}
                         <AnimatePresence>
                           {showProducts && (
                             <motion.div
@@ -430,12 +426,12 @@ const CrisopAISection = () => {
                                     hover:bg-emerald-50/50
                                   "
                                 >
-                                  {/* Product Image */}
+                            
                                   <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-lg bg-white">
                                     <div className="h-7 w-7 rounded-full bg-emerald-100" />
                                   </div>
 
-                                  {/* Product Info */}
+                              
                                   <div className="min-w-0 flex-1">
                                     <p className="truncate text-xs font-semibold text-gray-800">
                                       {product.name}
@@ -446,7 +442,7 @@ const CrisopAISection = () => {
                                     </p>
                                   </div>
 
-                                  {/* Arrow */}
+                             
                                   <motion.div
                                     initial={{
                                       opacity: 0,

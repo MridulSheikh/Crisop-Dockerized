@@ -8,7 +8,7 @@ const ProductDetailsSkeleton = () => {
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
           
-          {/* IMAGE SECTION */}
+          {/* Image section */}
           <div className="space-y-4">
             {/* main image */}
             <div className="aspect-square rounded-lg bg-gray-300" />
@@ -24,7 +24,7 @@ const ProductDetailsSkeleton = () => {
             </div>
           </div>
 
-          {/* INFO SECTION */}
+          {/* info */}
           <div className="space-y-6">
             {/* category */}
             <div className="h-3 w-24 bg-gray-300 rounded" />
@@ -53,7 +53,7 @@ const ProductDetailsSkeleton = () => {
           </div>
         </div>
 
-        {/* DESCRIPTION */}
+        {/* description */}
         <div className="mt-16 space-y-4">
           <div className="h-6 w-40 bg-gray-300 rounded" />
 

@@ -82,19 +82,19 @@ const FAQSection = () => {
 
   return (
     <section className="relative mt-10 overflow-hidden bg-[#f6f7f6] py-16 md:mt-24 md:px-5 lg:py-28">
-      {/* Background Glow */}
+    
       <div className="pointer-events-none absolute left-0 top-0 h-[500px] w-[500px] rounded-full bg-emerald-400/10 blur-[120px]" />
 
       <div className="pointer-events-none absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-green-400/10 blur-[120px]" />
 
       <div className="relative z-10 mx-auto max-w-screen-2xl px-6">
-        {/* Header */}
+        {/* header */}
         <motion.div
           variants={containerVariant}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          className="mx-auto mb-16 max-w-3xl text-center"
+          className="mx-auto mb-16 max-w-4xl text-center"
         >
           <motion.div
             variants={fadeUp}
@@ -106,7 +106,7 @@ const FAQSection = () => {
 
           <motion.h2
             variants={fadeUp}
-            className="text-3xl font-semibold leading-tight tracking-tight text-gray-900 md:text-5xl"
+            className="text-2xl md:text-6xl font-semibold leading-tight tracking-tight text-gray-900"
           >
             Everything you need to know
           </motion.h2>
@@ -120,9 +120,9 @@ const FAQSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Main Content */}
+        {/* main content  */}
         <div className="grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] xl:gap-16">
-          {/* LEFT — Image */}
+          {/* left side  */}
           <motion.div
             initial={{
               opacity: 0,
@@ -144,10 +144,10 @@ const FAQSection = () => {
             }}
             className="group relative"
           >
-            {/* Glow */}
+            {/* gradient  */}
             <div className="absolute -inset-4 rounded-[2.5rem] bg-emerald-400/10 opacity-70 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
 
-            {/* Image Card */}
+            {/* image card  */}
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem]">
               <Image
                 src="/img/crisop-faq.png"
@@ -159,7 +159,7 @@ const FAQSection = () => {
             </div>
           </motion.div>
 
-          {/* RIGHT — FAQ */}
+          {/* right faq  */}
           <motion.div
             variants={containerVariant}
             initial="hidden"

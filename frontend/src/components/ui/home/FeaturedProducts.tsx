@@ -83,7 +83,7 @@ const FeaturedProducts = () => {
       id="featured-products"
       className="relative overflow-hidden bg-[#f6f7f6] py-16 md:py-20 mt-20"
     >
-      {/* Background Decoratives */}
+      {/* Gradient divs */}
       <div className="pointer-events-none absolute -left-20 top-1/4 h-96 w-96 rounded-full bg-emerald-200/20 blur-[120px]" />
       <div className="pointer-events-none absolute -right-20 bottom-1/4 h-96 w-96 rounded-full bg-lime-200/20 blur-[120px]" />
 

@@ -43,14 +43,14 @@ export default function ProductDetailsClient({
 
   const dispatch = useAppDispatch();
 
-  // 🛒 cart
+  // cart
   const cartItems = useAppSelector((state) => state.cart.items);
 
-  // ❤️ wishlist (GLOBAL STATE)
+  // wishlist
   const wishlistItems = useAppSelector((state) => state.wishlist.products);
   const isWishlisted = wishlistItems.includes(product._id);
 
-  // UI states
+  // Ui states
   const [quantity, setQuantity] = useState(1);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -80,7 +80,7 @@ export default function ProductDetailsClient({
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
 
-  // 🛒 add to cart
+  // add to cart
   const handleAddToCart = async () => {
     try {
       setLoading(true);
@@ -96,7 +96,7 @@ export default function ProductDetailsClient({
     }
   };
 
-  // ❤️ wishlist toggle
+  // wishlist toggle
   const handleToggleWishlist = () => {
     if (wishLoading) return;
 
@@ -112,12 +112,12 @@ export default function ProductDetailsClient({
 
     setTimeout(() => {
       setWishLoading(false);
-    }, 300); // small debounce feel
+    }, 300); 
   };
 
   return (
     <div className="min-h-screen text-foreground lg:pt-20 relative">
-      {/* background gradient layer */}
+
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-green-50 via-white to-emerald-50" />
 
       {/* soft glow blobs */}
@@ -125,7 +125,7 @@ export default function ProductDetailsClient({
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-200/30 blur-3xl rounded-full -z-10" />
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* IMAGE */}
+          {/* product image slider */}
           <div className="space-y-4">
             <Carousel setApi={setApi}>
               <CarouselContent>
@@ -166,7 +166,7 @@ export default function ProductDetailsClient({
             </div>
           </div>
 
-          {/* INFO */}
+          {/* Details */}
           <div className="space-y-6">
             <p className="text-sm text-muted-foreground uppercase tracking-widest">
               {category.name}
@@ -175,7 +175,7 @@ export default function ProductDetailsClient({
             <div className="flex justify-between items-start">
               <h1 className="text-3xl font-semibold">{name}</h1>
 
-              {/* ❤️ Wishlist */}
+              {/* add to wishlist */}
               <button
                 onClick={handleToggleWishlist}
                 disabled={wishLoading}
@@ -189,7 +189,7 @@ export default function ProductDetailsClient({
               </button>
             </div>
 
-            {/* BRAND */}
+            {/* brand */}
             {brand && (
               <div className="flex items-center gap-2">
                 <div className="h-10 w-10 overflow-hidden border relative">

@@ -28,7 +28,7 @@ const categories = [
   },
 ];
 
-//REUSABLE ANIMATION
+//variant reuseble
 const fadeUpVariant = {
   hidden: {
     opacity: 0,
@@ -45,7 +45,7 @@ const fadeUpVariant = {
   }),
 };
 
-//REUSABLE CARD
+//Card
 const CategoryCard = ({
   item,
   className,
@@ -95,7 +95,7 @@ const CategoryCard = ({
   );
 };
 
-// COMPONENT
+
 const OurCategories = () => {
   return (
     <section

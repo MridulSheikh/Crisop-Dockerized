@@ -9,7 +9,7 @@ import {
   FaCcPaypal,
 } from "react-icons/fa";
 
-import { FaLocationDot, FaTelegram } from "react-icons/fa6";
+import {FaTelegram } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
 import { AiFillInstagram } from "react-icons/ai";
 import { FaXTwitter } from "react-icons/fa6";
@@ -18,9 +18,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Linkedin } from "lucide-react";
 
-/* =========================
-   DATA
-========================= */
+// link data
 
 const fakeSocialLink = [
   { icon: FaFacebook, link: "#" },
@@ -40,9 +38,7 @@ const paymentMethods = [
   FaCcPaypal,
 ];
 
-/* =========================
-   ANIMATION VARIANTS
-========================= */
+// Animation variant
 
 const containerVariant = {
   hidden: {},
@@ -78,20 +74,17 @@ const socialVariant = {
   },
 };
 
-/* =========================
-   COMPONENT
-========================= */
 
 const Footer = () => {
   return (
     <footer className="relative bg-[#0b1510] text-white overflow-hidden">
 
-      {/* BACKGROUND GLOW */}
+      {/* gradient */}
       <div className="absolute w-[500px] h-[500px] bg-green-500/10 blur-[140px] -top-20 -left-20" />
 
       <div className="absolute w-[400px] h-[400px] bg-emerald-500/10 blur-[140px] bottom-0 right-0" />
 
-      {/* GRID */}
+      {/* grid */}
       <motion.div
         variants={containerVariant}
         initial="hidden"
@@ -100,7 +93,7 @@ const Footer = () => {
         className="max-w-screen-2xl mx-auto px-5 py-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14 relative z-10"
       >
 
-        {/* ================= ABOUT ================= */}
+        {/* about */}
 
         <motion.div
           variants={fadeUp}
@@ -120,7 +113,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* SOCIAL */}
+          {/* social */}
           <div className="flex gap-3">
             {fakeSocialLink.map((dt, index) => (
               <motion.a
@@ -139,7 +132,7 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* ================= CONTACT ================= */}
+        {/* contact */}
 
         <motion.div
           variants={fadeUp}
@@ -189,7 +182,7 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* ================= LINKS ================= */}
+        {/* links */}
 
         <motion.div
           variants={fadeUp}
@@ -216,7 +209,7 @@ const Footer = () => {
           </ul>
         </motion.div>
 
-        {/* ================= PAYMENT ================= */}
+        {/* payment options  */}
 
         <motion.div
           variants={fadeUp}
@@ -231,7 +224,7 @@ const Footer = () => {
             seamless checkout experiences.
           </p>
 
-          {/* PAYMENT CARDS */}
+          {/* payment cards  */}
           <div className="flex gap-4">
 
             {paymentMethods.map((Icon, index) => (
@@ -249,7 +242,7 @@ const Footer = () => {
 
           </div>
 
-          {/* GLASS CARD */}
+          {/* glass card  */}
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="p-5 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl"
@@ -261,8 +254,8 @@ const Footer = () => {
         </motion.div>
 
       </motion.div>
-
-      {/* ================= BOTTOM ================= */}
+ 
+      {/* bottom */}
 
       <motion.div
         initial={{ opacity: 0 }}
