@@ -2,7 +2,7 @@
 
 <p align="center">
   <img
-    src="./frontend/public/img/md-banner.png"
+    src="./images/md-banner.png"
     alt="Crisop - Full Stack E-commerce Platform"
     width="100%"
   />
